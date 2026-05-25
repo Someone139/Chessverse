@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
@@ -10,6 +10,9 @@ export default function Home() {
   const [status, setStatus] = useState<string>("");
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [promotionPiece, setPromotionPiece] = useState("q");
+  const [whiteTime, setWhiteTime] = useState(600);
+  const [blackTime, setBlackTime] = useState(600);
+  const [gameOver, setGameOver] = useState(false);
 
   function makeMove(args: {
     sourceSquare: string;
@@ -57,6 +60,34 @@ export default function Home() {
 
     return true;
   }
+
+  useEffect(() => {
+    if (gameOver || !started) return;
+
+    const interval = setInterval(() => {
+      if (turn === "w") {
+        setWhiteTime((time) => {
+          if (time <= 0) {
+            setStatus("Time's up! Black wins");
+            setGameOver(true);
+            return 0;
+          }
+          return time - 1;
+        });
+      } else {
+        setBlackTime((time) => {
+          if (time <= 0) {
+            setStatus("Time's up! White wins");
+            setGameOver(true);
+            return 0;
+          }
+          return time - 1;
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [turn, gameOver, started]);
 
   return (
     <main className="flex min-h-screen bg-zinc-900 text-white justify-center">
@@ -111,6 +142,17 @@ export default function Home() {
             >
               Knight
             </button>
+          </div>
+          <div className="mb-4 flex w-[400px] justify-between text-lg font-semibold">
+            <div>
+              White: {Math.floor(whiteTime / 60)}:
+              {String(whiteTime % 60).padStart(2, "0")}
+            </div>
+
+            <div>
+              Black: {Math.floor(blackTime / 60)}:
+              {String(blackTime % 60).padStart(2, "0")}
+            </div>
           </div>
           <div className="w-[400px] shadow-2xl">
             <Chessboard
