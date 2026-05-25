@@ -1,0 +1,32 @@
+1. Minimal
+
+------------------------------------------------
+| Chessverse                                   |
+|----------------------------------------------|
+|                                              |
+|            Your move.                        |
+|                                              |
+|            [ Play Now ]                      |
+|                                              |
+|         clean dark gradient bg               |
+------------------------------------------------
+
+2. Split
+
+------------------------------------------------
+| Chessverse          |  chess board preview   |
+|---------------------|------------------------|
+| Play chess online   |   (faded board image) |
+| instantly           |                        |
+|                     |   [Play Now]          |
+------------------------------------------------
+
+3. Home page with buttons for functionalities - favourite
+
+------------------------------------------------
+| (Buttons here for all functionalities)	|
+|-----------------------------------------------|
+|	Chessverse (centered, big)		|
+|	Quick play/game history			|
+|						|
+------------------------------------------------

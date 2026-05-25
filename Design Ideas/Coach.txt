@@ -1,0 +1,13 @@
+1. Vertical split
+
+------------------------------------------------
+| Top buttons with functionalities             |
+------------------------------------------------
+| Explanation                                 |
+|                                           |
+|                                              |
+| Your move:                                 |
+| [ board ready to move ]         |
+|                                              |
+| Feedback: "Correct continuation"           |
+------------------------------------------------
