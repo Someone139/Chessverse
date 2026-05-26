@@ -184,7 +184,7 @@ export default function Home() {
                 {/* Quick Play */}
                 <button
                 onClick={() => setPage("Game")}
-                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#F25912] py-10 rounded-xl"
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#F25912] py-10 rounded-xl hover:scale-105 transition-transform duration-200 shadow-lg shadow-black/50"
                 >
                   <Swords size={45} color='#211832' className="mb-3"/>
                   <h2 className="font-semibold text-2xl">Quick Play</h2>
@@ -193,7 +193,7 @@ export default function Home() {
                 {/* Play with Friends */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors hover:scale-105 transition-transform duration-200 shadow-lg shadow-black/50"
                 >
                   <Users size={45} color='#211832' className="mb-3"/>
                   <h2 className="font-semibold text-2xl">Play with Friends</h2>
@@ -202,7 +202,7 @@ export default function Home() {
                 {/* Play with AI */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors hover:scale-105 transition-transform duration-200 shadow-lg shadow-black/50"
                 >
                   <Bot size={45} color='#211832' className="mb-3"/>
                   <h2 className="font-semibold text-2xl">Play vs AI</h2>
@@ -211,7 +211,7 @@ export default function Home() {
                 {/* Puzzles */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors hover:scale-105 transition-transform duration-200 shadow-lg shadow-black/50"
                 >
                   <Swords size={45} color='#211832' className="mb-3"/>
                   <h2 className="font-semibold text-2xl">Puzzles</h2>
