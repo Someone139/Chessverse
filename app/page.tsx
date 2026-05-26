@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { Swords, Clock, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings } from "lucide-react";
+import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot } from "lucide-react";
 
 export default function Home() {
   const [page, setPage] = useState<string>("Home");
@@ -109,11 +109,11 @@ export default function Home() {
               </button>
             </div>
             {/* Other buttons */}
-            <div className="flex items-center gap-5 mr-10">
+            <div className="flex items-center gap-5">
               {/* Play button */}
               <button
               onClick={() => setPage("Game")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <Swords size={18} className="mt-[5px]"/>
                 <p className="text-lg font-semibold">Play</p>
@@ -121,7 +121,7 @@ export default function Home() {
               {/* Puzzles */}
               <button
               onClick={() => setPage("Home")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <Puzzle size={18} className="mt-[4px]"/>
                 <p className="text-lg font-semibold">Puzzles</p>
@@ -129,7 +129,7 @@ export default function Home() {
               {/* Learn */}
               <button
               onClick={() => setPage("Home")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <BookOpen size={18} className="mt-[5px]"/>
                 <p className="text-lg font-semibold">Learn</p>
@@ -137,7 +137,7 @@ export default function Home() {
               {/* Stats */}
               <button
               onClick={() => setPage("Home")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <ChartNoAxesCombined size={18} className="mt-[4px]"/>
                 <p className="text-lg font-semibold">Statistics</p>
@@ -145,7 +145,7 @@ export default function Home() {
               {/* Leaderboard */}
               <button
               onClick={() => setPage("Home")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <Trophy size={18} className="mt-[4px]"/>
                 <p className="text-lg font-semibold">Leaderboard</p>
@@ -153,25 +153,75 @@ export default function Home() {
               {/* Settings */}
               <button
               onClick={() => setPage("Home")}
-              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3"
+              className="flex cursor-pointer gap-1 bg-[#211832]/90 rounded-lg px-6 py-3 hover:bg-[#5C3E94] transition-colors"
               >
                 <Settings size={18} className="mt-[4px]"/>
                 <p className="text-lg font-semibold">Settings</p>
               </button>
             </div>
+            <div className="flex items-center ml-2">
+              {/* Profile Button */}
+              <button
+              onClick={() => setPage("Home")}
+              className="flex gap-1.5 bg-[#211832] cursor-pointer rounded-lg px-8 py-3 hover:bg-[#5C3E94] transition-colors"
+              >
+                <User size={30} className="-mt-0.5"/>
+                <div className="font-semibold text-lg">
+                  Profile
+                </div>
+              </button>
+            </div>
 
           </header>
-          <div className="text-center space-y-1 pt-5 bg-gradient-to-b from-[#211832]/80 to-zinc-900/90">
-            <h1 className="text-5xl font-bold">Hello, this website is under development please save and check again later.</h1>
-            <p className="text-zinc-400">
-              Your move.
-            </p>
-            <button
-            onClick={() => setPage("Game")}
-            className="mt-4 inline-block text-center rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-zinc-300 transition-colors"
-            >
-              Play Now
-            </button>
+          <div className="grid grid-rows-2 text-center items-center bg-gradient-to-b from-[#211832]/80 to-zinc-900/90">
+            <div className="grid grid-rows-2 text-center items-center space-y-5">
+              <div className="flex flex-col text-center items-center justify-center">
+                <ChessKing size={60} className="mb-2"/>
+                <h1 className="font-bold text-6xl">Chessverse</h1>
+                <p className="text-zinc-200 -mt-1">Your Move</p>
+              </div>
+              <div className="grid grid-cols-4 text-center items-center justify-center space-x-10 px-10">
+                {/* Quick Play */}
+                <button
+                onClick={() => setPage("Game")}
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#F25912] py-10 rounded-xl"
+                >
+                  <Swords size={45} color='#211832' className="mb-3"/>
+                  <h2 className="font-semibold text-2xl">Quick Play</h2>
+                  <p className="text-xs text-zinc-200 mt-1.5">Jump into a game</p>
+                </button>
+                {/* Play with Friends */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                >
+                  <Users size={45} color='#211832' className="mb-3"/>
+                  <h2 className="font-semibold text-2xl">Play with Friends</h2>
+                  <p className="text-xs text-zinc-200 mt-1.5">Challenge a friend</p>
+                </button>
+                {/* Play with AI */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                >
+                  <Bot size={45} color='#211832' className="mb-3"/>
+                  <h2 className="font-semibold text-2xl">Play vs AI</h2>
+                  <p className="text-xs text-zinc-200 mt-1.5">Train against AI</p>
+                </button>
+                {/* Puzzles */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex flex-col text-center items-center justify-center cursor-pointer bg-[#5C3E94] py-10 rounded-xl hover:bg-[#412B6B] transition-colors"
+                >
+                  <Swords size={45} color='#211832' className="mb-3"/>
+                  <h2 className="font-semibold text-2xl">Puzzles</h2>
+                  <p className="text-xs text-zinc-200 mt-1.5">Solve and Improve</p>
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col text-center items-center">
+              <h1 className="text-7xl">This website is under development. Please save the URL and check again later. One day, you might be playing chess here.</h1>
+            </div>
           </div>
         </div>
       )}
