@@ -2,7 +2,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot, Plus } from "lucide-react";
+import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot, Plus, Flag, Handshake, Undo2, RefreshCcw, SquarePlus } from "lucide-react";
 
 export default function Home() {
   const [page, setPage] = useState<string>("Home");
@@ -24,6 +24,8 @@ export default function Home() {
     const { sourceSquare, targetSquare } = args;
 
     if (!targetSquare) return false;
+
+    if (gameOver) return false;
 
     const isWhitePiece = game.get(sourceSquare as any)?.color === "w";
 
@@ -309,7 +311,7 @@ export default function Home() {
 
           <div className="grid grid-cols-3 h-[calc(100vh-60px)] gap-2 bg-gradient-to-b from-[#211832]/80 to-zinc-900/90 overflow-hidden">
             {/* Move History */}
-            <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col">
+            <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col h-[95%]">
               <h2 className="mb-2 text-3xl font-bold self-center justify-self-center">
                 Move History
               </h2>
@@ -426,14 +428,71 @@ export default function Home() {
               </div>
             </div>
             {/* Game Tools */}
-            <div className="w-[400px] text-center">
-              {page === "Game" && status && (
-                <p className="mb-3 text-yellow-400 font-semibold">
-                  {status}
-                </p>
-              )}
+            <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
+              <h2 className="mb-2 text-3xl font-bold self-center justify-self-center">
+                Game Tools
+              </h2>
+
+              {/* Resign */}
+              <button
+              onClick={() => {
+                if (!gameOver) {
+                  setGameOver(true);
+                  setStatus(turn === "w"
+                    ? "White resigned. Black wins."
+                    : "Black resigned. White wins."
+                  );
+                }
+              }}
+              className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#FF0000]/80 transition-all duration-200"
+              >
+                <Flag size={30} />
+                <p className="text-semibold">Resign</p>
+              </button>
+
+              {/* Draw */}
+
+              <button
+              onClick={() => setPage("Game")}
+              className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+              >
+                <Handshake size={30} />
+                <p className="text-semibold">Offer Draw</p>
+              </button>
+
+              {/* Take back */}
+
+              <button
+              onClick={() => setPage("Game")}
+              className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+              >
+                <Undo2 size={30} className="mb-1.5"/>
+                <p className="text-semibold">Take Back</p>
+              </button>
+
+              {/* Flip board */}
+
+              <button
+              onClick={() => setPage("Game")}
+              className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+              >
+                <RefreshCcw size={30} className="mb-1"/>
+                <p className="text-semibold">Flip Board</p>
+              </button>
             </div>
           </div>
+        </div>
+      )}
+      {status && (
+        <div className="fixed flex flex-col justify-between items-center p-5 top-[40%] left-[50%] -translate-x-1/2 z-50 rounded-xl bg-[#412B6B] w-200 h-60 shadow-2xl border border-[#5C3E94]">
+          <p className="text-4xl font-bold text-center">{status}</p>
+          <button
+          onClick={() => setPage("Game")}
+          className="flex gap-1 shadow bg-[#F25912] rounded-lg py-2.5 px-4 cursor-pointer hover:bg-[#5C3E94] hover:shadow-[#F25912]/80 hover:scale-102 transition-all duration-200"
+          >
+            <SquarePlus size={40} />
+            <p className="text-xl font-semibold mt-1.5">New Game</p>
+          </button>
         </div>
       )}
     </main>
