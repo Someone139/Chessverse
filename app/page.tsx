@@ -9,12 +9,18 @@ export default function Home() {
   const [game, setGame] = useState(new Chess());
   const [turn, setTurn] = useState<"w" | "b">("w");
   const [status, setStatus] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [promotionPiece, setPromotionPiece] = useState("q");
   const [whiteTime, setWhiteTime] = useState(600);
   const [blackTime, setBlackTime] = useState(600);
   const [gameOver, setGameOver] = useState(false);
   const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
+  const [showPromotion, setShowPromotion] = useState(false);
+  const [promotionMove, setPromotionMove] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
 
   function makeMove(args: {
     sourceSquare: string;
@@ -33,7 +39,27 @@ export default function Home() {
       return false;
     }
 
-    const gameCopy = new Chess(game.fen());
+    const gameCopy = new Chess();
+    gameCopy.loadPgn(game.pgn());
+
+    const piece = game.get(sourceSquare as any);
+
+    if (
+      piece?.type === "p" &&
+      (
+        (piece.color === "w" && targetSquare[1] === "8") ||
+        (piece.color === "b" && targetSquare[1] === "1")
+      )
+    ) {
+      setPromotionMove({
+        from: sourceSquare,
+        to: targetSquare,
+      });
+
+      setShowPromotion(true);
+
+      return false;
+    }
 
     const move = gameCopy.move({
       from: sourceSquare,
@@ -48,13 +74,17 @@ export default function Home() {
     setMoveHistory((prev) => [...prev, move.san]);
 
     if (gameCopy.isCheckmate()) {
-      setStatus(`Checkmate! ${gameCopy.turn() === "w" ? "Black" : "White"} wins`);
+      setGameOver(true)
+      setShowModal(true)
+      setStatus(`Checkmate! ${gameCopy.turn() === "w" ? "Black" : "White"} wins!`);
     }
     else if (gameCopy.isCheck()) {
-      setStatus(`${gameCopy.turn() === "w" ? "White" : "Black"} is in check`);
+      setStatus(`${gameCopy.turn() === "w" ? "White" : "Black"} is in check.`);
     }
     else if (gameCopy.isDraw()) {
-      setStatus("Draw");
+      setGameOver(true)
+      setShowModal(true)
+      setStatus("Draw!");
     }
     else {
       setStatus("");
@@ -72,8 +102,9 @@ export default function Home() {
       if (turn === "w") {
         setWhiteTime((time) => {
           if (time <= 0) {
-            setStatus("Time's up! Black wins");
+            setStatus("Time's up! Black wins!");
             setGameOver(true);
+            setShowModal(true)
             return 0;
           }
           return time - 1;
@@ -81,8 +112,9 @@ export default function Home() {
       } else {
         setBlackTime((time) => {
           if (time <= 0) {
-            setStatus("Time's up! White wins");
+            setStatus("Time's up! White wins!");
             setGameOver(true);
+            setShowModal(true)
             return 0;
           }
           return time - 1;
@@ -92,6 +124,41 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, [turn, gameOver, page]);
+
+  function newGame() {
+    setGame(new Chess());
+    setMoveHistory([]);
+    setWhiteTime(600);
+    setBlackTime(600);
+    setGameOver(false);
+    setStatus("");
+    setTurn("w");
+    setShowModal(false)
+  }
+
+  function handlePromotion(piece: string) {
+    if (!promotionMove) return;
+
+    const gameCopy = new Chess();
+    gameCopy.loadPgn(game.pgn());
+
+    const move = gameCopy.move({
+      from: promotionMove.from,
+      to: promotionMove.to,
+      promotion: piece,
+    });
+
+    if (!move) return;
+
+    setGame(gameCopy);
+
+    setMoveHistory(prev => [...prev, move.san]);
+
+    setTurn(gameCopy.turn());
+
+    setShowPromotion(false);
+    setPromotionMove(null);
+  }
 
   return (
     <main className="flex min-h-screen text-white justify-center">
@@ -438,56 +505,111 @@ export default function Home() {
               onClick={() => {
                 if (!gameOver) {
                   setGameOver(true);
+                  setShowModal(true)
                   setStatus(turn === "w"
-                    ? "White resigned. Black wins."
-                    : "Black resigned. White wins."
+                    ? "White resigned. Black wins!"
+                    : "Black resigned. White wins!"
                   );
                 }
               }}
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#FF0000]/80 transition-all duration-200"
               >
                 <Flag size={30} />
-                <p className="text-semibold">Resign</p>
+                <p>Resign</p>
               </button>
 
               {/* Draw */}
 
               <button
-              onClick={() => setPage("Game")}
+              onClick={() => {
+                setGameOver(true);
+                setShowModal(true);
+                setStatus("Draw agreed.");
+              }}
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
               >
                 <Handshake size={30} />
-                <p className="text-semibold">Offer Draw</p>
+                <p>Offer Draw</p>
               </button>
 
               {/* Take back */}
 
               <button
-              onClick={() => setPage("Game")}
+              onClick={() => {
+                const gameCopy = new Chess();
+
+                gameCopy.loadPgn(game.pgn());
+
+                console.log(gameCopy.history());
+
+                gameCopy.undo();
+                gameCopy.undo();
+
+                setMoveHistory(prev => prev.slice(0, -2));
+                setGame(gameCopy);
+                setTurn(gameCopy.turn());
+              }}
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
               >
                 <Undo2 size={30} className="mb-1.5"/>
-                <p className="text-semibold">Take Back</p>
+                <p>Take Back</p>
               </button>
 
               {/* Flip board */}
 
               <button
-              onClick={() => setPage("Game")}
+              onClick={() =>
+                setBoardOrientation(
+                  boardOrientation === "white" ? "black" : "white"
+                )
+              }
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
               >
                 <RefreshCcw size={30} className="mb-1"/>
-                <p className="text-semibold">Flip Board</p>
+                <p>Flip Board</p>
               </button>
             </div>
           </div>
         </div>
       )}
-      {status && (
+      {showPromotion && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-[#412B6B] rounded-xl p-6 flex gap-4 shadow-2xl">
+            <button
+              onClick={() => handlePromotion("q")}
+              className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
+            >
+              Queen
+            </button>
+
+            <button
+              onClick={() => handlePromotion("r")}
+              className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
+            >
+              Rook
+            </button>
+
+            <button
+              onClick={() => handlePromotion("b")}
+              className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
+            >
+              Bishop
+            </button>
+
+            <button
+              onClick={() => handlePromotion("n")}
+              className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
+            >
+              Knight
+            </button>
+          </div>
+        </div>
+      )}
+      {status && showModal && (
         <div className="fixed flex flex-col justify-between items-center p-5 top-[40%] left-[50%] -translate-x-1/2 z-50 rounded-xl bg-[#412B6B] w-200 h-60 shadow-2xl border border-[#5C3E94]">
           <p className="text-4xl font-bold text-center">{status}</p>
           <button
-          onClick={() => setPage("Game")}
+          onClick={newGame}
           className="flex gap-1 shadow bg-[#F25912] rounded-lg py-2.5 px-4 cursor-pointer hover:bg-[#5C3E94] hover:shadow-[#F25912]/80 hover:scale-102 transition-all duration-200"
           >
             <SquarePlus size={40} />
