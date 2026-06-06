@@ -24,6 +24,7 @@ export default function Home() {
   const moveHistoryRef = useRef<HTMLDivElement>(null);
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
+  const [isViewingHistory, setIsViewingHistory] = useState(false);
   const [lastMove, setLastMove] = useState<{
     from: string;
     to: string;
@@ -83,6 +84,8 @@ export default function Home() {
     });
 
     if (!move) return false;
+
+    setViewIndex(null);
 
     gameRef.current = gameCopy;
 
@@ -169,31 +172,54 @@ export default function Home() {
       return false;
     }
 
+    if (viewIndex !== null) {
+      const newMoves = moves.slice(0, viewIndex + 1);
+
+      const replay = new Chess();
+
+      for (let i = 0; i < newMoves.length; i++) {
+        replay.move(newMoves[i]);
+      }
+
+      gameRef.current = replay;
+
+      setMoves(newMoves);
+      setViewIndex(null);
+      setIsViewingHistory(false);
+    }
+
     return applyMove(sourceSquare, targetSquare);
   }
 
-  function newGame() {
-    const freshGame = new Chess();
+function newGame() {
+  const freshGame = new Chess();
 
-    gameRef.current = freshGame;
+  gameRef.current = freshGame;
 
-    setGame(freshGame);
+  setGame(new Chess());
 
-    setHistory([]);
-    setWhiteTime(600);
-    setBlackTime(600);
-    setGameOver(false);
-    setStatus("");
-    setTurn("w");
-    setShowModal(false);
+  setHistory([]);
+  setMoves([]);
+  setViewIndex(null);
+  setIsViewingHistory(false);
 
-    setSelectedSquare(null);
-    setLegalMoves([]);
-    setLastMove(null);
-    setShowPromotion(false);
-    setPromotionMove(null);
-    setBoardOrientation("white");
-  }
+  setWhiteTime(600);
+  setBlackTime(600);
+
+  setGameOver(false);
+  setStatus("");
+  setTurn("w");
+  setShowModal(false);
+
+  setSelectedSquare(null);
+  setLegalMoves([]);
+  setLastMove(null);
+
+  setShowPromotion(false);
+  setPromotionMove(null);
+
+  setBoardOrientation("white");
+}
 
   function handlePromotion(piece: string) {
     if (!promotionMove) return;
@@ -271,6 +297,7 @@ export default function Home() {
 
   useEffect(() => {
     if (gameOver) return;
+    if (isViewingHistory) return;
     if (turn !== "b") return;
 
     const timeout = setTimeout(async () => {
@@ -299,19 +326,6 @@ export default function Home() {
 
     return () => clearTimeout(timeout);
   }, [turn, gameOver]);
-
-  useEffect(() => {
-    if (viewIndex === null) return;
-
-    const replay = new Chess();
-
-    for (let i = 0; i <= viewIndex; i++) {
-      const fen = history[i];
-      replay.load(fen);
-    }
-
-    setGame(new Chess(replay.fen()));
-  }, [viewIndex]);
 
   return (
     <main className="flex min-h-screen text-white justify-center">
@@ -542,19 +556,53 @@ export default function Home() {
                     <Fragment key={index}>
                       
                       {/* index */}
-                      <div className="bg-[#5C3E94] pl-1 w-full px-2 flex items-center h-8 rounded-sm">
+                      <div className="bg-[#5C3E94] pl-1 shadow w-full px-2 flex items-center h-8 rounded-sm">
                         {index + 1}.
                       </div>
 
                       {/* white */}
-                      <div className="bg-[#5C3E94] pl-2 w-full px-2 flex items-center h-8 rounded-sm">
+                      <button
+                      onClick={() => {
+                        const clickedIndex = index * 2;
+
+                        const replay = new Chess();
+
+                        for (let i = 0; i <= clickedIndex; i++) {
+                          replay.move(moves[i]);
+                        }
+
+                        setIsViewingHistory(true);
+
+                        gameRef.current = replay;
+                        syncUI(replay, null);
+                        setViewIndex(clickedIndex);
+                      }}
+                      className="bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200"
+                      >
                         {moves[index * 2]}
-                      </div>
+                      </button>
 
                       {/* black */}
-                      <div className="bg-[#5C3E94] pl-2 w-full px-2 flex items-center h-8 rounded-sm">
+                      <button
+                        onClick={() => {
+                          const clickedIndex = index * 2 + 1;
+
+                          const replay = new Chess();
+
+                          for (let i = 0; i <= clickedIndex; i++) {
+                            replay.move(moves[i]);
+                          }
+
+                          setIsViewingHistory(true);
+
+                          gameRef.current = replay;
+                          syncUI(replay, null);
+                          setViewIndex(clickedIndex);
+                        }}
+                      className="bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200"
+                      >
                         {moves[index * 2 + 1] || ""}
-                      </div>
+                      </button>
 
                     </Fragment>
                   ))}
@@ -745,23 +793,31 @@ export default function Home() {
               onClick={() => {
                 if (gameOver) return;
 
-                const gameCopy = gameRef.current;
+                const targetIndex =
+                  viewIndex !== null ? viewIndex : moves.length - 1;
 
-                let removed = 0;
+                if (targetIndex < 0) return;
 
-                if (gameCopy.undo()) removed++;
-                if (gameCopy.undo()) removed++;
+                const pairStart =
+                  targetIndex % 2 === 0
+                    ? targetIndex
+                    : targetIndex - 1;
 
-                setTurn(gameCopy.turn());
-                updateGameState(gameCopy);
+                const newMoves = moves.slice(0, pairStart);
 
-                gameRef.current = gameCopy;
+                const replay = new Chess();
 
-                setGame(new Chess(gameCopy.fen()));
+                for (let i = 0; i < newMoves.length; i++) {
+                  replay.move(newMoves[i]);
+                }
 
-                setMoves(prev => prev.slice(0, -removed));
+                setIsViewingHistory(false);
 
-                syncUI(gameCopy, null);
+                gameRef.current = replay;
+                setMoves(newMoves);
+                setViewIndex(null);
+
+                syncUI(replay, null);
               }}
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
               >
