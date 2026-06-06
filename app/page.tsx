@@ -1,26 +1,134 @@
 "use client";
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useRef } from 'react';
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot, Plus, Flag, Handshake, Undo2, RefreshCcw, SquarePlus } from "lucide-react";
+import { getBestMove } from "@/lib/stockfish";
 
 export default function Home() {
   const [page, setPage] = useState<string>("Home");
   const [game, setGame] = useState(new Chess());
+  const gameRef = useRef(new Chess());
   const [turn, setTurn] = useState<"w" | "b">("w");
   const [status, setStatus] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
-  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<string[]>([]);
+  const [moves, setMoves] = useState<string[]>([]);
+  const [viewIndex, setViewIndex] = useState<number | null>(null);
   const [promotionPiece, setPromotionPiece] = useState("q");
   const [whiteTime, setWhiteTime] = useState(600);
   const [blackTime, setBlackTime] = useState(600);
   const [gameOver, setGameOver] = useState(false);
   const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
   const [showPromotion, setShowPromotion] = useState(false);
+  const moveHistoryRef = useRef<HTMLDivElement>(null);
+  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
+  const [legalMoves, setLegalMoves] = useState<string[]>([]);
+  const [lastMove, setLastMove] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
   const [promotionMove, setPromotionMove] = useState<{
     from: string;
     to: string;
   } | null>(null);
+
+  function syncUI(game: Chess, lastMove?: { from: string; to: string } | null) {
+    setGame(new Chess(game.fen()));
+    setTurn(game.turn());
+    setLastMove(lastMove ?? null);
+    setSelectedSquare(null);
+    setLegalMoves([]);
+  }
+
+  function updateGameState(gameCopy: Chess) {
+    if (gameCopy.isCheckmate()) {
+      setGameOver(true);
+      setShowModal(true);
+      setStatus(
+        `Checkmate! ${gameCopy.turn() === "w" ? "Black" : "White"} wins!`
+      );
+    }
+    else if (gameCopy.isCheck()) {
+      setStatus(
+        `${gameCopy.turn() === "w" ? "White" : "Black"} is in check.`
+      );
+    }
+    else if (gameCopy.isDraw()) {
+      setGameOver(true);
+      setShowModal(true);
+      setStatus("Draw!");
+    }
+    else {
+      setStatus("");
+    }
+  }
+
+  function getLegalMoves(square: string) {
+    const moves = game.moves({
+      square: square as any,
+      verbose: true,
+    });
+
+    return moves.map((m) => m.to);
+  }
+
+  function applyMove(from: string, to: string) {
+    const gameCopy = gameRef.current;
+
+    const move = gameCopy.move({
+      from,
+      to,
+      promotion: promotionPiece,
+    });
+
+    if (!move) return false;
+
+    gameRef.current = gameCopy;
+
+    syncUI(gameCopy, {
+      from: move.from,
+      to: move.to,
+    });
+
+    setHistory(prev => [...prev, gameCopy.fen()]);
+    setMoves(prev => [...prev, move.san]);
+    
+    updateGameState(gameCopy);
+
+    return true;
+  } 
+
+  function onSquareClick({ square }: { square: string; piece?: any }) {
+    const pieceObj = gameRef.current.get(square as any);
+
+    if (!selectedSquare) {
+      if (pieceObj && pieceObj.color === turn) {
+        setSelectedSquare(square);
+        setLegalMoves(getLegalMoves(square));
+      }
+      return;
+    }
+
+    if (selectedSquare === square) {
+      setSelectedSquare(null);
+      setLegalMoves([]);
+      return;
+    }
+
+    if (legalMoves.includes(square)) {
+      applyMove(selectedSquare, square);
+      return;
+    }
+
+    if (pieceObj && pieceObj.color === turn) {
+      setSelectedSquare(square);
+      setLegalMoves(getLegalMoves(square));
+    } else {
+      setSelectedSquare(null);
+      setLegalMoves([]);
+    }
+  }
 
   function makeMove(args: {
     sourceSquare: string;
@@ -29,70 +137,97 @@ export default function Home() {
   }): boolean {
     const { sourceSquare, targetSquare } = args;
 
-    if (!targetSquare) return false;
+    setSelectedSquare(null);
+    setLegalMoves([]);
 
+    if (!targetSquare) return false;
     if (gameOver) return false;
 
-    const isWhitePiece = game.get(sourceSquare as any)?.color === "w";
+    const piece = gameRef.current.get(sourceSquare as any);
+    if (!piece) return false;
+
+    const isWhitePiece = piece.color === "w";
 
     if ((turn === "w" && !isWhitePiece) || (turn === "b" && isWhitePiece)) {
       return false;
     }
 
-    const gameCopy = new Chess();
-    gameCopy.loadPgn(game.pgn());
+    const movesList = gameRef.current.moves({
+      square: sourceSquare as any,
+      verbose: true,
+    });
 
-    const piece = game.get(sourceSquare as any);
+    const match = movesList.find(m => m.to === targetSquare);
 
-    if (
-      piece?.type === "p" &&
-      (
-        (piece.color === "w" && targetSquare[1] === "8") ||
-        (piece.color === "b" && targetSquare[1] === "1")
-      )
-    ) {
-      setPromotionMove({
-        from: sourceSquare,
-        to: targetSquare,
-      });
+    if (!match) return false;
 
+    const isPromotion = match.piece === "p" && (match.to[1] === "8" || match.to[1] === "1");
+
+    if (isPromotion) {
+      setPromotionMove({ from: sourceSquare, to: targetSquare });
       setShowPromotion(true);
-
       return false;
     }
 
+    return applyMove(sourceSquare, targetSquare);
+  }
+
+  function newGame() {
+    const freshGame = new Chess();
+
+    gameRef.current = freshGame;
+
+    setGame(freshGame);
+
+    setHistory([]);
+    setWhiteTime(600);
+    setBlackTime(600);
+    setGameOver(false);
+    setStatus("");
+    setTurn("w");
+    setShowModal(false);
+
+    setSelectedSquare(null);
+    setLegalMoves([]);
+    setLastMove(null);
+    setShowPromotion(false);
+    setPromotionMove(null);
+    setBoardOrientation("white");
+  }
+
+  function handlePromotion(piece: string) {
+    if (!promotionMove) return;
+
+    const gameCopy = gameRef.current;
+
     const move = gameCopy.move({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: promotionPiece,
+      from: promotionMove.from,
+      to: promotionMove.to,
+      promotion: piece,
     });
 
-    if (!move) return false;
+    if (!move) return;
 
-    setGame(gameCopy);
+    gameRef.current = gameCopy;
 
-    setMoveHistory((prev) => [...prev, move.san]);
+    syncUI(gameCopy, {
+      from: move.from,
+      to: move.to,
+    });
 
-    if (gameCopy.isCheckmate()) {
-      setGameOver(true)
-      setShowModal(true)
-      setStatus(`Checkmate! ${gameCopy.turn() === "w" ? "Black" : "White"} wins!`);
-    }
-    else if (gameCopy.isCheck()) {
-      setStatus(`${gameCopy.turn() === "w" ? "White" : "Black"} is in check.`);
-    }
-    else if (gameCopy.isDraw()) {
-      setGameOver(true)
-      setShowModal(true)
-      setStatus("Draw!");
-    }
-    else {
-      setStatus("");
-    }
+    gameRef.current = gameCopy;
 
-    setTurn(turn === "w" ? "b" : "w");
+    setGame(new Chess(gameCopy.fen()));
+    setHistory(prev => [...prev, gameCopy.fen()]);
 
-    return true;
+    setLastMove({ from: move.from, to: move.to });
+
+    setTurn(gameCopy.turn());
+
+    updateGameState(gameCopy);
+
+    setShowPromotion(false);
+    setPromotionMove(null);
   }
 
   useEffect(() => {
@@ -125,40 +260,58 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [turn, gameOver, page]);
 
-  function newGame() {
-    setGame(new Chess());
-    setMoveHistory([]);
-    setWhiteTime(600);
-    setBlackTime(600);
-    setGameOver(false);
-    setStatus("");
-    setTurn("w");
-    setShowModal(false)
-  }
+  useEffect(() => {
+    if (!moveHistoryRef.current) return;
 
-  function handlePromotion(piece: string) {
-    if (!promotionMove) return;
-
-    const gameCopy = new Chess();
-    gameCopy.loadPgn(game.pgn());
-
-    const move = gameCopy.move({
-      from: promotionMove.from,
-      to: promotionMove.to,
-      promotion: piece,
+    moveHistoryRef.current.scrollTo({
+      top: moveHistoryRef.current.scrollHeight,
+      behavior: "smooth",
     });
+  }, [moves]);
 
-    if (!move) return;
+  useEffect(() => {
+    if (gameOver) return;
+    if (turn !== "b") return;
 
-    setGame(gameCopy);
+    const timeout = setTimeout(async () => {
+      const moveStr = await getBestMove(gameRef.current.fen());
+      if (!moveStr) return;
 
-    setMoveHistory(prev => [...prev, move.san]);
+      const from = moveStr.slice(0, 2);
+      const to = moveStr.slice(2, 4);
+      const promotion = moveStr.length === 5 ? moveStr[4] : undefined;
 
-    setTurn(gameCopy.turn());
+      const validatedMove = gameRef.current.move({ 
+        from, 
+        to, 
+        promotion: promotion || "q" 
+      });
 
-    setShowPromotion(false);
-    setPromotionMove(null);
-  }
+      if (!validatedMove) return;
+
+      syncUI(gameRef.current, { from, to });
+      
+      setHistory(prev => [...prev, gameRef.current.fen()]);
+      setMoves(prev => [...prev, validatedMove.san]);
+
+      updateGameState(gameRef.current);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [turn, gameOver]);
+
+  useEffect(() => {
+    if (viewIndex === null) return;
+
+    const replay = new Chess();
+
+    for (let i = 0; i <= viewIndex; i++) {
+      const fen = history[i];
+      replay.load(fen);
+    }
+
+    setGame(new Chess(replay.fen()));
+  }, [viewIndex]);
 
   return (
     <main className="flex min-h-screen text-white justify-center">
@@ -383,17 +536,29 @@ export default function Home() {
                 Move History
               </h2>
 
-              <div className="grid grid-cols-2 gap-y-2 mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0">
-                {Array.from({ length: Math.ceil(moveHistory.length / 2) }).map((_, index) => (
-                  <Fragment key={index}>
-                    <div key={`w-${index}`} className="bg-[#5C3E94] pl-1">
-                      {index + 1}. {moveHistory[index * 2]}
-                    </div>
-                    <div key={`b-${index}`} className="bg-[#5C3E94] ml-2 pl-1">
-                      {moveHistory[index * 2 + 1] || ""}
-                    </div>
-                  </Fragment>
-                ))}
+              <div className="mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0">
+                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0 content-start">
+                  {Array.from({ length: Math.ceil(moves.length / 2) }).map((_, index) => (
+                    <Fragment key={index}>
+                      
+                      {/* index */}
+                      <div className="bg-[#5C3E94] pl-1 w-full px-2 flex items-center h-8 rounded-sm">
+                        {index + 1}.
+                      </div>
+
+                      {/* white */}
+                      <div className="bg-[#5C3E94] pl-2 w-full px-2 flex items-center h-8 rounded-sm">
+                        {moves[index * 2]}
+                      </div>
+
+                      {/* black */}
+                      <div className="bg-[#5C3E94] pl-2 w-full px-2 flex items-center h-8 rounded-sm">
+                        {moves[index * 2 + 1] || ""}
+                      </div>
+
+                    </Fragment>
+                  ))}
+                </div>
               </div>
             </div>
             {/* Board */}
@@ -447,6 +612,48 @@ export default function Home() {
                     boardOrientation: boardOrientation,
                     position: game.fen(),
                     onPieceDrop: makeMove as any,
+                    onSquareClick: onSquareClick,
+                    squareStyles: {
+                      ...(lastMove
+                        ? {
+                            [lastMove.from]: {
+                              backgroundColor: "rgba(215, 219, 127, 0.5)",
+                            },
+                            [lastMove.to]: {
+                              backgroundColor: "rgba(215, 219, 127, 0.5)",
+                            },
+                          }
+                        : {}),
+                      ...(selectedSquare
+                        ? {
+                            [selectedSquare]: {
+                              backgroundColor: "rgba(215, 219, 127, 0.5)",
+                            },
+                          }
+                        : {}),
+                      ...legalMoves.reduce((acc, sq) => {
+                        const isCapture = game.get(sq as any);
+                        acc[sq] = {
+                          background: isCapture
+                            ? `
+                              radial-gradient(circle,
+                                transparent 0%,
+                                transparent 47%,
+                                rgba(0, 0, 0, 0.35) 40%,
+                                rgba(0, 0, 0, 0.35) 60%,
+                                transparent 61%
+                              )
+                            `
+                            : `
+                              radial-gradient(circle,
+                                rgba(0, 0, 0, 0.35) 25%,
+                                transparent 26%
+                              )
+                            `,
+                        };
+                        return acc;
+                      }, {} as Record<string, any>),
+                    }
                   }}
                 />
               </div>
@@ -536,18 +743,25 @@ export default function Home() {
 
               <button
               onClick={() => {
-                const gameCopy = new Chess();
+                if (gameOver) return;
 
-                gameCopy.loadPgn(game.pgn());
+                const gameCopy = gameRef.current;
 
-                console.log(gameCopy.history());
+                let removed = 0;
 
-                gameCopy.undo();
-                gameCopy.undo();
+                if (gameCopy.undo()) removed++;
+                if (gameCopy.undo()) removed++;
 
-                setMoveHistory(prev => prev.slice(0, -2));
-                setGame(gameCopy);
                 setTurn(gameCopy.turn());
+                updateGameState(gameCopy);
+
+                gameRef.current = gameCopy;
+
+                setGame(new Chess(gameCopy.fen()));
+
+                setMoves(prev => prev.slice(0, -removed));
+
+                syncUI(gameCopy, null);
               }}
               className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
               >
