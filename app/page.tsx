@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect, Fragment, useRef } from 'react';
+import { useState, useEffect, Fragment, useRef, JSX } from 'react';
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot, Plus, Flag, Handshake, Undo2, RefreshCcw, SquarePlus } from "lucide-react";
+import { Swords, ChessKing, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User, Users, Bot, Plus, Flag, Handshake, Undo2, RefreshCcw, SquarePlus, ChevronLast, ChevronFirst, ChevronRight, ChevronLeft, ChessPawn, ChessBishop, ChessKnight, ChessQueen, ChessRook } from "lucide-react";
 import { getBestMove } from "@/lib/stockfish";
 
 export default function Home() {
@@ -25,6 +25,16 @@ export default function Home() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
   const [isViewingHistory, setIsViewingHistory] = useState(false);
+  const currentIndex = viewIndex !== null ? viewIndex : moves.length - 1;
+  const atStart = currentIndex <= -1;
+  const atEnd = currentIndex >= moves.length - 1;
+  const [captured, setCaptured] = useState<{
+    w: string[];
+    b: string[];
+  }>({
+    w: [],
+    b: [],
+  });
   const [lastMove, setLastMove] = useState<{
     from: string;
     to: string;
@@ -40,6 +50,41 @@ export default function Home() {
     setLastMove(lastMove ?? null);
     setSelectedSquare(null);
     setLegalMoves([]);
+  }
+
+  function getMoveSquares(moveIndex: number) {
+    const replay = new Chess();
+
+    let lastMove = null;
+
+    for (let i = 0; i <= moveIndex; i++) {
+      lastMove = replay.move(moves[i]);
+    }
+
+    if (!lastMove) return null;
+
+    return {
+      from: lastMove.from,
+      to: lastMove.to,
+    };
+  }
+
+  function updateCaptured(move: any) {
+    if (move.captured) {
+      setCaptured(prev => {
+        if (move.color === "w") {
+          return {
+            ...prev,
+            b: [...prev.b, move.captured],
+          };
+        } else {
+          return {
+            ...prev,
+            w: [...prev.w, move.captured],
+          };
+        }
+      });
+    }
   }
 
   function updateGameState(gameCopy: Chess) {
@@ -65,6 +110,21 @@ export default function Home() {
     }
   }
 
+  function getPieceSymbol(p: string): React.ReactNode {
+    const base = "w-4 h-4 opacity-80";
+
+    const map: Record<string, JSX.Element> = {
+      p: <ChessPawn className={base} />,
+      r: <ChessRook className={base} />,
+      n: <ChessKnight className={base} />,
+      b: <ChessBishop className={base} />,
+      q: <ChessQueen className={base} />,
+      k: <ChessKing className={base} />,
+    };
+
+    return map[p];
+  }
+
   function getLegalMoves(square: string) {
     const moves = game.moves({
       square: square as any,
@@ -82,6 +142,8 @@ export default function Home() {
       to,
       promotion: promotionPiece,
     });
+
+    updateCaptured(move);
 
     if (!move) return false;
 
@@ -232,6 +294,8 @@ function newGame() {
       promotion: piece,
     });
 
+    updateCaptured(move);
+
     if (!move) return;
 
     gameRef.current = gameCopy;
@@ -313,6 +377,8 @@ function newGame() {
         to, 
         promotion: promotion || "q" 
       });
+
+      updateCaptured(validatedMove);
 
       if (!validatedMove) return;
 
@@ -551,7 +617,7 @@ function newGame() {
               </h2>
 
               <div className="mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0">
-                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0 content-start">
+                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0 content-start p-1">
                   {Array.from({ length: Math.ceil(moves.length / 2) }).map((_, index) => (
                     <Fragment key={index}>
                       
@@ -574,10 +640,18 @@ function newGame() {
                         setIsViewingHistory(true);
 
                         gameRef.current = replay;
-                        syncUI(replay, null);
+
+                        const moveSquares = getMoveSquares(clickedIndex);
+                        syncUI(replay, moveSquares);
+
                         setViewIndex(clickedIndex);
                       }}
-                      className="bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200"
+                      className={`bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200 ${
+                        viewIndex === index * 2 ||
+                        (viewIndex === null && index * 2 === moves.length - 1)
+                          ? "ring-2 ring-[#F25912]"
+                          : ""
+                      }`}
                       >
                         {moves[index * 2]}
                       </button>
@@ -596,10 +670,19 @@ function newGame() {
                           setIsViewingHistory(true);
 
                           gameRef.current = replay;
-                          syncUI(replay, null);
+
+                          const moveSquares = getMoveSquares(clickedIndex);
+
+                          syncUI(replay, moveSquares);
+                          
                           setViewIndex(clickedIndex);
                         }}
-                      className="bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200"
+                      className={`bg-[#5C3E94] pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-[#5C3E94]/50 transition-all duration-200 ${
+                        viewIndex === index * 2 + 1 ||
+                        (viewIndex === null && index * 2 + 1 === moves.length - 1)
+                          ? "ring-2 ring-[#F25912]"
+                          : ""
+                      }`}
                       >
                         {moves[index * 2 + 1] || ""}
                       </button>
@@ -608,9 +691,102 @@ function newGame() {
                   ))}
                 </div>
               </div>
+              <div className="flex items-center justify-center gap-x-3 w-full mt-2¬">
+                <button
+                disabled={atStart}
+                onClick={() => {
+                  setIsViewingHistory(true);
+                  setViewIndex(-1);
+
+                  const replay = new Chess();
+
+                  syncUI(replay, null)
+                }}
+                className="bg-[#5C3E94] p-3 shadow shadow-black/50 rounded-lg cursor-pointer hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5C3E94] disabled:hover:shadow-black/50"
+                >
+                  <ChevronFirst size={40}/>
+                </button>
+
+                <button
+                disabled={atStart}
+                onClick={() => {
+                  const currentIndex =
+                    viewIndex !== null ? viewIndex : moves.length - 1;
+
+                  if (currentIndex <= -1) return;
+
+                  const newIndex = currentIndex - 1;
+
+                  setIsViewingHistory(true);
+                  setViewIndex(newIndex);
+
+                  const replay = new Chess();
+
+                  for (let i = 0; i <= newIndex; i++) {
+                    replay.move(moves[i]);
+                  }
+
+                  const moveSquares = newIndex >= 0 ? getMoveSquares(newIndex) : null;
+
+                  syncUI(replay, moveSquares);
+                }}
+                className="bg-[#5C3E94] p-3 shadow shadow-black/50 rounded-lg cursor-pointer hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5C3E94] disabled:hover:shadow-black/50"
+                >
+                  <ChevronLeft size={40}/>
+                </button>
+
+                <button
+                disabled={atEnd}
+                onClick={() => {
+                  const currentIndex =
+                    viewIndex !== null ? viewIndex : -1;
+
+                  if (currentIndex >= moves.length - 1) return;
+
+                  const newIndex = currentIndex + 1;
+
+                  setIsViewingHistory(true);
+                  setViewIndex(newIndex);
+
+                  const replay = new Chess();
+
+                  for (let i = 0; i <= newIndex; i++) {
+                    replay.move(moves[i]);
+                  }
+
+                  const moveSquares = getMoveSquares(newIndex);
+
+                  syncUI(replay, moveSquares);
+                }}
+                className="bg-[#5C3E94] p-3 shadow shadow-black/50 rounded-lg cursor-pointer hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5C3E94] disabled:hover:shadow-black/50"
+                >
+                  <ChevronRight size={40}/>
+                </button>
+
+                <button
+                disabled={atEnd}
+                onClick={() => {
+                  setIsViewingHistory(false);
+                  setViewIndex(null);
+
+                  const moveSquares =
+                    moves.length > 0
+                      ? getMoveSquares(moves.length - 1)
+                      : null;
+
+                  syncUI(
+                    new Chess(gameRef.current.fen()),
+                    moveSquares
+                  );
+                }}
+                className="bg-[#5C3E94] p-3 shadow shadow-black/50 rounded-lg cursor-pointer hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5C3E94] disabled:hover:shadow-black/50"
+                >
+                  <ChevronLast size={40}/>
+                </button>
+              </div>
             </div>
             {/* Board */}
-            <div className="grid grid-rows-[80px_1fr_80px] items-center h-full justify-items-center">
+            <div className="grid grid-rows-[80px_1fr_80px] h-full items-center">
               <div className="grid grid-cols-3 w-[500px] h-[80px] bg-[#412B6B] items-center rounded-xl mt-10">
                 <div className="flex text-center justify-self-start ml-5">
                   <ChessKing size={40} className="self-center -mt-2"/>
@@ -654,7 +830,27 @@ function newGame() {
                   </button>
                 )}
               </div>
-              <div className="w-full max-w-[500px] h-full max-h-[500px] shadow-2xl">
+              <div className="flex flex-col w-[500px] h-[540px] shadow-2xl">
+                <div className="flex w-full h-[20px]">
+                  {boardOrientation === "black" &&
+                    <div className="flex gap-0.5 h-[20px] flex-nowrap">
+                      {captured.w.map((p, i) => (
+                        <span key={i} className="text-lg opacity-80">
+                          {getPieceSymbol(p)}
+                        </span>
+                      ))}
+                    </div>
+                  }
+                  {boardOrientation === "white" &&
+                    <div className="flex gap-0.5 h-[20px] flex-nowrap">
+                      {captured.b.map((p, i) => (
+                        <span key={i} className="text-lg opacity-80">
+                          {getPieceSymbol(p)}
+                        </span>
+                      ))}
+                    </div>
+                  }
+                </div>
                 <Chessboard
                   options={{
                     boardOrientation: boardOrientation,
@@ -704,6 +900,26 @@ function newGame() {
                     }
                   }}
                 />
+                <div className="flex w-full h-[20px] mt-0.5">
+                  {boardOrientation === "white" &&
+                    <div className="flex gap-0.5 h-[20px] flex-nowrap">
+                      {captured.w.map((p, i) => (
+                        <span key={i}>
+                          {getPieceSymbol(p)}
+                        </span>
+                      ))}
+                    </div>
+                  }
+                  {boardOrientation === "black" &&
+                    <div className="flex gap-0.5 h-[20px] flex-nowrap">
+                      {captured.b.map((p, i) => (
+                        <span key={i}>
+                          {getPieceSymbol(p)}
+                        </span>
+                      ))}
+                    </div>
+                  }
+                </div>
               </div>
               <div className="grid grid-cols-3 w-[500px] h-[80px] bg-[#412B6B] items-center rounded-xl mb-10">
                 <div className="flex text-center justify-self-start ml-5">
