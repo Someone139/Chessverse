@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Chess } from "chess.js";
+import type { Square } from "chess.js";
 
 export function useChessGame({
     promotionMove,
@@ -64,10 +65,29 @@ export function useChessGame({
     }
 
     // APPLY MOVES
-    function applyMove(from: string, to: string, promotion = "q") {
+    function applyMove(from: string, to: string, promotion?: string) {
         const gameCopy = gameRef.current;
 
-        const move = gameCopy.move({ from, to, promotion });
+        const piece = gameCopy.get(from as Square);
+
+        const isPawn = piece?.type === "p";
+
+        const isPromotionSquare =
+        (piece?.color === "w" && to[1] === "8") ||
+        (piece?.color === "b" && to[1] === "1");
+
+        if (isPawn && isPromotionSquare && !promotion) {
+            setPromotionMove({ from, to });
+            setShowPromotion(true);
+            return false;
+        }
+
+        const move = gameCopy.move({
+            from,
+            to,
+            promotion
+        });
+        
         if (!move) return false;
 
         updateCaptured(move);
@@ -78,6 +98,8 @@ export function useChessGame({
 
         setMoves(prev => [...prev, move.san]);
         setHistory(prev => [...prev, gameCopy.fen()]);
+
+        updateGameState()
 
         return true;
     }
@@ -94,14 +116,25 @@ export function useChessGame({
         const g = gameRef.current;
 
         if (g.isCheckmate()) {
-        setStatus(`Checkmate! ${g.turn() === "w" ? "Black" : "White"} wins!`);
-        } else if (g.isCheck()) {
-        setStatus(`${g.turn() === "w" ? "White" : "Black"} is in check.`);
-        } else if (g.isDraw()) {
-        setStatus("Draw!");
-        } else {
-        setStatus("");
+            setStatus(`Checkmate! ${g.turn() === "w" ? "Black" : "White"} wins!`);
+            setGameOver(true);
+            setShowModal(true);
+            return;
         }
+
+        if (g.isDraw()) {
+            setStatus("Draw!");
+            setGameOver(true);
+            setShowModal(true);
+            return;
+        }
+
+        if (g.isCheck()) {
+            setStatus(`${g.turn() === "w" ? "White" : "Black"} is in check.`);
+            return;
+        }
+
+        setStatus("");
     }
 
     // RESET GAME
@@ -170,7 +203,7 @@ export function useChessGame({
         }
 
         if (legalMoves.includes(square)) {
-            applyMove(selectedSquare, square);
+            applyMove(selectedSquare, square, undefined);
             return;
         }
 
@@ -215,7 +248,10 @@ export function useChessGame({
 
         if (!match) return false;
 
-        const isPromotion = match.piece === "p" && (match.to[1] === "8" || match.to[1] === "1");
+        const isPromotion =
+        match.piece === "p" &&
+        ((match.color === "w" && match.to[1] === "8") ||
+        (match.color === "b" && match.to[1] === "1"));
 
         if (isPromotion) {
             setPromotionMove({ from: sourceSquare, to: targetSquare });
