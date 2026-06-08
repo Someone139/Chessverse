@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef, JSX } from 'react';
-import { Chess } from "chess.js";
 import { ChessKing, ChessPawn, ChessBishop, ChessKnight, ChessQueen, ChessRook } from "lucide-react";
 import { getBestMove } from "@/lib/stockfish";
 import GameOverModal from "@/components/GameOverModal";
@@ -14,111 +13,69 @@ import HomePage from '@/components/HomePage';
 import { useChessGame } from '@/components/useChessGame';
 
 export default function Home() {
-  const [page, setPage] = useState<string>("Home");
-
-  const [game, setGame] = useState(new Chess());
-  const gameRef = useRef(new Chess());
-  const [history, setHistory] = useState<string[]>([]);
-  const [moves, setMoves] = useState<string[]>([]);
-  const [viewIndex, setViewIndex] = useState<number | null>(null);
-
-  const [turn, setTurn] = useState<"w" | "b">("w");
-  const [status, setStatus] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
-  const [promotionPiece, setPromotionPiece] = useState("q");
-  const [whiteTime, setWhiteTime] = useState(600);
-  const [blackTime, setBlackTime] = useState(600);
   const [gameOver, setGameOver] = useState(false);
-  const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
   const [showPromotion, setShowPromotion] = useState(false);
-  const moveHistoryRef = useRef<HTMLDivElement>(null);
-  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
-  const [legalMoves, setLegalMoves] = useState<string[]>([]);
   const [isViewingHistory, setIsViewingHistory] = useState(false);
-  const currentIndex = viewIndex !== null ? viewIndex : moves.length - 1;
-  const atStart = currentIndex <= -1;
-  const atEnd = currentIndex >= moves.length - 1;
-  const [captured, setCaptured] = useState<{
-    w: string[];
-    b: string[];
-  }>({
-    w: [],
-    b: [],
-  });
-  const [lastMove, setLastMove] = useState<{
-    from: string;
-    to: string;
-  } | null>(null);
   const [promotionMove, setPromotionMove] = useState<{
     from: string;
     to: string;
   } | null>(null);
 
-  function syncUI(game: Chess, lastMove?: { from: string; to: string } | null) {
-    setGame(new Chess(game.fen()));
-    setTurn(game.turn());
-    setLastMove(lastMove ?? null);
-    setSelectedSquare(null);
-    setLegalMoves([]);
-  }
+  const {
+    game,
+    gameRef,
+    moves,
+    setMoves,
+    setHistory,
+    viewIndex,
+    setViewIndex,
 
-  function getMoveSquares(moveIndex: number) {
-    const replay = new Chess();
+    turn,
+    status,
+    setStatus,
 
-    let lastMove = null;
+    selectedSquare,
+    legalMoves,
 
-    for (let i = 0; i <= moveIndex; i++) {
-      lastMove = replay.move(moves[i]);
-    }
+    lastMove,
+    captured,
 
-    if (!lastMove) return null;
+    whiteTime,
+    setWhiteTime,
+    blackTime,
+    setBlackTime,
 
-    return {
-      from: lastMove.from,
-      to: lastMove.to,
-    };
-  }
+    aiCancelledRef,
 
-  function updateCaptured(move: any) {
-    if (move.captured) {
-      setCaptured(prev => {
-        if (move.color === "w") {
-          return {
-            ...prev,
-            b: [...prev.b, move.captured],
-          };
-        } else {
-          return {
-            ...prev,
-            w: [...prev.w, move.captured],
-          };
-        }
-      });
-    }
-  }
+    syncUI,
+    updateCaptured,
+    updateGameState,
+    newGame,
+    getMoveSquares,
+    onSquareClick,
+    makeMove,
+    handlePromotion,
+  } = useChessGame({
+    promotionMove,
+    setShowPromotion,
 
-  function updateGameState(gameCopy: Chess) {
-    if (gameCopy.isCheckmate()) {
-      setGameOver(true);
-      setShowModal(true);
-      setStatus(
-        `Checkmate! ${gameCopy.turn() === "w" ? "Black" : "White"} wins!`
-      );
-    }
-    else if (gameCopy.isCheck()) {
-      setStatus(
-        `${gameCopy.turn() === "w" ? "White" : "Black"} is in check.`
-      );
-    }
-    else if (gameCopy.isDraw()) {
-      setGameOver(true);
-      setShowModal(true);
-      setStatus("Draw!");
-    }
-    else {
-      setStatus("");
-    }
-  }
+    setPromotionMove,
+
+    gameOver,
+    setGameOver,
+
+    setShowModal,
+
+    setIsViewingHistory,
+  });
+  const [page, setPage] = useState<string>("Home");
+
+  const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
+  const moveHistoryRef = useRef<HTMLDivElement>(null);
+  const currentIndex = viewIndex !== null ? viewIndex : moves.length - 1;
+  const atStart = currentIndex <= -1;
+  const atEnd = currentIndex >= moves.length - 1;
 
   function getPieceSymbol(p: string): React.ReactNode {
     const base = "w-4 h-4 opacity-80";
@@ -133,201 +90,6 @@ export default function Home() {
     };
 
     return map[p];
-  }
-
-  function getLegalMoves(square: string) {
-    const moves = game.moves({
-      square: square as any,
-      verbose: true,
-    });
-
-    return moves.map((m) => m.to);
-  }
-
-  function applyMove(from: string, to: string) {
-    const gameCopy = gameRef.current;
-
-    const move = gameCopy.move({
-      from,
-      to,
-      promotion: promotionPiece,
-    });
-
-    updateCaptured(move);
-
-    if (!move) return false;
-
-    setViewIndex(null);
-
-    gameRef.current = gameCopy;
-
-    syncUI(gameCopy, {
-      from: move.from,
-      to: move.to,
-    });
-
-    setHistory(prev => [...prev, gameCopy.fen()]);
-    setMoves(prev => [...prev, move.san]);
-    
-    updateGameState(gameCopy);
-
-    return true;
-  } 
-
-  function onSquareClick({ square }: { square: string; piece?: any }) {
-    const pieceObj = gameRef.current.get(square as any);
-
-    if (!selectedSquare) {
-      if (pieceObj && pieceObj.color === turn) {
-        setSelectedSquare(square);
-        setLegalMoves(getLegalMoves(square));
-      }
-      return;
-    }
-
-    if (selectedSquare === square) {
-      setSelectedSquare(null);
-      setLegalMoves([]);
-      return;
-    }
-
-    if (legalMoves.includes(square)) {
-      applyMove(selectedSquare, square);
-      return;
-    }
-
-    if (pieceObj && pieceObj.color === turn) {
-      setSelectedSquare(square);
-      setLegalMoves(getLegalMoves(square));
-    } else {
-      setSelectedSquare(null);
-      setLegalMoves([]);
-    }
-  }
-
-  function makeMove(args: {
-    sourceSquare: string;
-    targetSquare: string | null;
-    piece: string;
-  }): boolean {
-    const { sourceSquare, targetSquare } = args;
-
-    setSelectedSquare(null);
-    setLegalMoves([]);
-
-    if (!targetSquare) return false;
-    if (gameOver) return false;
-
-    const piece = gameRef.current.get(sourceSquare as any);
-    if (!piece) return false;
-
-    const isWhitePiece = piece.color === "w";
-
-    if ((turn === "w" && !isWhitePiece) || (turn === "b" && isWhitePiece)) {
-      return false;
-    }
-
-    const movesList = gameRef.current.moves({
-      square: sourceSquare as any,
-      verbose: true,
-    });
-
-    const match = movesList.find(m => m.to === targetSquare);
-
-    if (!match) return false;
-
-    const isPromotion = match.piece === "p" && (match.to[1] === "8" || match.to[1] === "1");
-
-    if (isPromotion) {
-      setPromotionMove({ from: sourceSquare, to: targetSquare });
-      setShowPromotion(true);
-      return false;
-    }
-
-    if (viewIndex !== null) {
-      const newMoves = moves.slice(0, viewIndex + 1);
-
-      const replay = new Chess();
-
-      for (let i = 0; i < newMoves.length; i++) {
-        replay.move(newMoves[i]);
-      }
-
-      gameRef.current = replay;
-
-      setMoves(newMoves);
-      setViewIndex(null);
-      setIsViewingHistory(false);
-    }
-
-    return applyMove(sourceSquare, targetSquare);
-  }
-
-function newGame() {
-  const freshGame = new Chess();
-
-  gameRef.current = freshGame;
-
-  setGame(new Chess());
-
-  setHistory([]);
-  setMoves([]);
-  setViewIndex(null);
-  setIsViewingHistory(false);
-
-  setWhiteTime(600);
-  setBlackTime(600);
-
-  setGameOver(false);
-  setStatus("");
-  setTurn("w");
-  setShowModal(false);
-
-  setSelectedSquare(null);
-  setLegalMoves([]);
-  setLastMove(null);
-
-  setShowPromotion(false);
-  setPromotionMove(null);
-
-  setBoardOrientation("white");
-}
-
-  function handlePromotion(piece: string) {
-    if (!promotionMove) return;
-
-    const gameCopy = gameRef.current;
-
-    const move = gameCopy.move({
-      from: promotionMove.from,
-      to: promotionMove.to,
-      promotion: piece,
-    });
-
-    updateCaptured(move);
-
-    if (!move) return;
-
-    gameRef.current = gameCopy;
-
-    syncUI(gameCopy, {
-      from: move.from,
-      to: move.to,
-    });
-
-    gameRef.current = gameCopy;
-
-    setGame(new Chess(gameCopy.fen()));
-    setHistory(prev => [...prev, gameCopy.fen()]);
-
-    setLastMove({ from: move.from, to: move.to });
-
-    setTurn(gameCopy.turn());
-
-    updateGameState(gameCopy);
-
-    setShowPromotion(false);
-    setPromotionMove(null);
   }
 
   useEffect(() => {
@@ -372,11 +134,18 @@ function newGame() {
   useEffect(() => {
     if (gameOver) return;
     if (isViewingHistory) return;
+    if (viewIndex !== null) return;
     if (turn !== "b") return;
 
+    aiCancelledRef.current = false;
+
     const timeout = setTimeout(async () => {
+      if (aiCancelledRef.current) return;
+
       const moveStr = await getBestMove(gameRef.current.fen());
       if (!moveStr) return;
+
+      if (aiCancelledRef.current) return;
 
       const from = moveStr.slice(0, 2);
       const to = moveStr.slice(2, 4);
@@ -392,15 +161,20 @@ function newGame() {
 
       if (!validatedMove) return;
 
+      if (aiCancelledRef.current) return;
+
       syncUI(gameRef.current, { from, to });
       
       setHistory(prev => [...prev, gameRef.current.fen()]);
       setMoves(prev => [...prev, validatedMove.san]);
 
-      updateGameState(gameRef.current);
+      updateGameState();
     }, 500);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      aiCancelledRef.current = true;
+    }
   }, [turn, gameOver]);
 
   return (
@@ -493,6 +267,8 @@ function newGame() {
 
               boardOrientation={boardOrientation}
               setBoardOrientation={setBoardOrientation}
+
+              aiCancelledRef={aiCancelledRef}
             />
           </div>
         </div>

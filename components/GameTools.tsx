@@ -19,6 +19,7 @@ type Props = {
 
   boardOrientation: "white" | "black";
   setBoardOrientation: (v: "white" | "black") => void;
+  aiCancelledRef: React.RefObject<boolean>;
 };
 
 export default function GameTools({
@@ -39,6 +40,7 @@ export default function GameTools({
 
     boardOrientation,
     setBoardOrientation,
+    aiCancelledRef,
 }: Props) {
     return(
         <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
@@ -50,6 +52,7 @@ export default function GameTools({
             <button
             onClick={() => {
             if (!gameOver) {
+                aiCancelledRef.current = true;
                 setGameOver(true);
                 setShowModal(true)
                 setStatus(turn === "w"
