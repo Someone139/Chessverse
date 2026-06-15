@@ -53,14 +53,44 @@ export function useChessGame({
 
     // UPDATE CAPTURED PIECES
     function updateCaptured(move: any) {
-        if (!move?.captured) return;
+        if (!move) return;
 
-        setCaptured(prev => {
-        if (move.color === "w") {
-            return { ...prev, b: [...prev.b, move.captured] };
-        } else {
-            return { ...prev, w: [...prev.w, move.captured] };
+        rebuildCaptured(gameRef.current);
+    }
+
+    function rebuildCaptured(game: Chess) {
+        const start = {
+            p: 8,
+            n: 2,
+            b: 2,
+            r: 2,
+            q: 1,
+        };
+        const remainingWhite = { p: 0, r: 0, n: 0, b: 0, q: 0 };
+        const remainingBlack = { p: 0, r: 0, n: 0, b: 0, q: 0 };
+        for (const row of game.board()) {
+            for (const piece of row) {
+                if (!piece || piece.type === "k") continue;
+                if (piece.color === "w") {
+                    remainingWhite[piece.type]++;
+                } else {
+                    remainingBlack[piece.type]++;
+                }
+            }
         }
+        const capturedByWhite: string[] = [];
+        const capturedByBlack: string[] = [];
+        for (const type of Object.keys(start) as Array<keyof typeof start>) {
+            for (let i = 0; i < start[type] - remainingBlack[type]; i++) {
+                capturedByWhite.push(type);
+            }
+            for (let i = 0; i < start[type] - remainingWhite[type]; i++) {
+                capturedByBlack.push(type);
+            }
+        }
+        setCaptured({
+            w: capturedByBlack,
+            b: capturedByWhite,
         });
     }
 
@@ -345,6 +375,7 @@ export function useChessGame({
     // logic
     syncUI,
     updateCaptured,
+    rebuildCaptured,
     updateGameState,
     newGame,
     getMoveSquares,

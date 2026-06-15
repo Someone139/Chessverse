@@ -50,6 +50,7 @@ export default function Home() {
 
     syncUI,
     updateCaptured,
+    rebuildCaptured,
     updateGameState,
     newGame,
     getMoveSquares,
@@ -123,11 +124,11 @@ export default function Home() {
   }, [turn, gameOver, page]);
 
   useEffect(() => {
-    if (!moveHistoryRef.current) return;
+    const container = moveHistoryRef.current;
+    if (!container) return;
 
-    moveHistoryRef.current.scrollTo({
-      top: moveHistoryRef.current.scrollHeight,
-      behavior: "smooth",
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
     });
   }, [moves]);
 
@@ -154,7 +155,7 @@ export default function Home() {
       const validatedMove = gameRef.current.move({ 
         from, 
         to, 
-        promotion: promotion || "q" 
+        promotion: promotion
       });
 
       updateCaptured(validatedMove);
@@ -213,6 +214,8 @@ export default function Home() {
               getMoveSquares={getMoveSquares}
               atStart={atStart}
               atEnd={atEnd}
+              moveHistoryRef={moveHistoryRef}
+              rebuildCaptured={rebuildCaptured}
             />
 
             {/* Board Area */}

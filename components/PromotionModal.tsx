@@ -1,3 +1,5 @@
+import { ChessQueen, ChessRook, ChessBishop, ChessKnight } from "lucide-react";
+
 export default function PromotionModal({
   showPromotion,
   handlePromotion,
@@ -14,28 +16,28 @@ export default function PromotionModal({
             onClick={() => handlePromotion("q")}
             className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
         >
-            Queen
+            <ChessQueen size={40} strokeWidth={1.5} />
         </button>
 
         <button
             onClick={() => handlePromotion("r")}
             className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
         >
-            Rook
+            <ChessRook size={40} strokeWidth={1.5} />
         </button>
 
         <button
             onClick={() => handlePromotion("b")}
             className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
         >
-            Bishop
+            <ChessBishop size={40} strokeWidth={1.5} />
         </button>
 
         <button
             onClick={() => handlePromotion("n")}
             className="bg-[#5C3E94] p-4 rounded-lg cursor-pointer"
         >
-            Knight
+            <ChessKnight size={40} strokeWidth={1.5} />
         </button>
         </div>
     </div>

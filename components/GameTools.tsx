@@ -71,9 +71,12 @@ export default function GameTools({
 
             <button
             onClick={() => {
-            setGameOver(true);
-            setShowModal(true);
-            setStatus("Draw agreed.");
+            if (!gameOver) {
+                aiCancelledRef.current = true;
+                setGameOver(true);
+                setShowModal(true);
+                setStatus("Draw agreed.");
+            }
             }}
             className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
             >
