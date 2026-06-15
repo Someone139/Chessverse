@@ -89,7 +89,7 @@ export default function MoveHistory({
                             const replay = new Chess();
 
                             for (let i = 0; i <= clickedIndex; i++) {
-                            replay.move(moves[i]);
+                                replay.move(moves[i]);
                             }
 
                             setIsViewingHistory(true);
