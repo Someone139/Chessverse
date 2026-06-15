@@ -324,9 +324,11 @@ export function useChessGame({
             promotion: piece,
         });
 
+        if (!move) return;
+
         updateCaptured(move);
 
-        if (!move) return;
+        setMoves(prev => [...prev, move.san]);
 
         gameRef.current = gameCopy;
 
