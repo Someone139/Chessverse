@@ -19,7 +19,7 @@ export default function HomePage({ setPage }: Props) {
                 {/* Quick Play */}
                 <button
                 onClick={() => setPage("Game")}
-                className="flex flex-col text-center border border-border items-center justify-center cursor-pointer bg-accent py-10 rounded-xl hover:bg-accentHover hover:scale-105 shadow-lg shadow-black/50 active:bg-accentActive transition-all duration-200"
+                className="flex flex-col text-center border border-buttonBorder items-center justify-center cursor-pointer bg-accent py-10 rounded-xl hover:bg-accentHover hover:scale-105 shadow-lg shadow-black/50 active:bg-accentActive transition-all duration-200"
                 >
                     <Swords size={45} className="mb-3 text-iconAccent"/>
                     <h2 className="font-semibold text-2xl">Quick Play</h2>
@@ -28,7 +28,7 @@ export default function HomePage({ setPage }: Props) {
                 {/* Play with Friends */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center border border-border items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
+                className="flex flex-col text-center border border-buttonBorder items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
                 >
                     <Users size={45} className="mb-3 text-icon"/>
                     <h2 className="font-semibold text-2xl text-text">Play with Friends</h2>
@@ -37,7 +37,7 @@ export default function HomePage({ setPage }: Props) {
                 {/* Play with AI */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center border border-border items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
+                className="flex flex-col text-center border border-buttonBorder items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
                 >
                     <Bot size={45} className="mb-3 text-icon"/>
                     <h2 className="font-semibold text-2xl text-text">Play vs AI</h2>
@@ -46,7 +46,7 @@ export default function HomePage({ setPage }: Props) {
                 {/* Puzzles */}
                 <button
                 onClick={() => setPage("Home")}
-                className="flex flex-col text-center border border-border items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
+                className="flex flex-col text-center border border-buttonBorder items-center justify-center cursor-pointer bg-surface py-10 rounded-xl hover:bg-surfaceHover hover:scale-105 shadow-lg shadow-black/50 active:bg-surfaceActive transition-all duration-200"
                 >
                     <Puzzle size={45} className="mb-3 text-icon"/>
                     <h2 className="font-semibold text-2xl text-text">Puzzles</h2>

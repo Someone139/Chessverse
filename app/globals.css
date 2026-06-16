@@ -10,6 +10,10 @@
   --color-surfaceHover: #002966;
   --color-surfaceActive: #001433;
 
+  --color-surfaceDark: #002966;
+  --color-surfaceDarkHover: #0052CC;
+  --color-surfaceDarkActive: #001433;
+
   /* Text */
   --color-text: #E5F0FF;
   --color-textMuted: #CCE0FF;
@@ -26,7 +30,8 @@
   --color-iconAccent: #FFFFFF;
 
   /* Borders */
-  --color-border: #3A4A66;
+  --color-buttonBorder: #3A4A66;
+  --color-border: #001433;
 
   --color-digital-blue-50: #e5f0ff;
   --color-digital-blue-100: #cce0ff;

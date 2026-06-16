@@ -20,6 +20,7 @@ type Props = {
   boardOrientation: "white" | "black";
   setBoardOrientation: (v: "white" | "black") => void;
   aiCancelledRef: React.RefObject<boolean>;
+  rebuildCaptured: (game: Chess) => void;
 };
 
 export default function GameTools({
@@ -41,6 +42,7 @@ export default function GameTools({
     boardOrientation,
     setBoardOrientation,
     aiCancelledRef,
+    rebuildCaptured,
 }: Props) {
     return(
         <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
@@ -115,6 +117,7 @@ export default function GameTools({
             setViewIndex(null);
 
             syncUI(replay, null);
+            rebuildCaptured(replay)
             }}
             className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
             >

@@ -59,35 +59,41 @@ export function useChessGame({
     }
 
     function rebuildCaptured(game: Chess) {
-        const start = {
-            p: 8,
-            n: 2,
-            b: 2,
-            r: 2,
-            q: 1,
-        };
-        const remainingWhite = { p: 0, r: 0, n: 0, b: 0, q: 0 };
-        const remainingBlack = { p: 0, r: 0, n: 0, b: 0, q: 0 };
-        for (const row of game.board()) {
-            for (const piece of row) {
-                if (!piece || piece.type === "k") continue;
-                if (piece.color === "w") {
-                    remainingWhite[piece.type]++;
-                } else {
-                    remainingBlack[piece.type]++;
-                }
-            }
-        }
+        const replay = new Chess();
+
         const capturedByWhite: string[] = [];
         const capturedByBlack: string[] = [];
-        for (const type of Object.keys(start) as Array<keyof typeof start>) {
-            for (let i = 0; i < start[type] - remainingBlack[type]; i++) {
-                capturedByWhite.push(type);
+
+        const history = game.history({ verbose: true });
+
+        for (const move of history) {
+            if (move.captured) {
+                if (move.color === "w") {
+                    capturedByWhite.push(move.captured);
+                } else {
+                    capturedByBlack.push(move.captured);
+                }
             }
-            for (let i = 0; i < start[type] - remainingWhite[type]; i++) {
-                capturedByBlack.push(type);
-            }
+
+            replay.move(move);
         }
+
+        const pieceOrder = {
+            q: 5,
+            r: 4,
+            b: 3,
+            n: 2,
+            p: 1,
+        };
+
+        capturedByWhite.sort(
+            (a, b) => pieceOrder[b as keyof typeof pieceOrder] - pieceOrder[a as keyof typeof pieceOrder]
+        );
+
+        capturedByBlack.sort(
+            (a, b) => pieceOrder[b as keyof typeof pieceOrder] - pieceOrder[a as keyof typeof pieceOrder]
+        );
+
         setCaptured({
             w: capturedByBlack,
             b: capturedByWhite,

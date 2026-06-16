@@ -181,7 +181,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen text-white justify-center">
       {page === "Home" && (
-        <div className="min-h-screen min-w-screen grid grid-rows-[60px_1fr]">
+        <div className="min-h-screen min-w-screen grid grid-rows-[70px_1fr]">
           {/* Top Bar */}
           <TopBar
             setPage={setPage}
@@ -194,14 +194,13 @@ export default function Home() {
         </div>
       )}
       {page === "Game" && (
-        <div className="grid grid-rows-[60px_1fr] min-h-screen min-w-screen text-white">
+        <div className="grid grid-rows-[70px_1fr] min-h-screen min-w-screen text-white">
           {/* Top Bar */}
           <TopBar
             setPage={setPage}
           />
 
-          <div className="grid grid-cols-3 h-[calc(100vh-60px)] gap-2 bg-gradient-to-b from-[#211832]/80 to-zinc-900/90 overflow-hidden">
-
+          <div className="grid grid-cols-3 h-[calc(100vh-70px)] gap-2 bg-gradient-to-b from-bg1 to-bg2 overflow-hidden">
             {/* Move History */}
             <MoveHistory
               moves={moves}
@@ -272,6 +271,8 @@ export default function Home() {
               setBoardOrientation={setBoardOrientation}
 
               aiCancelledRef={aiCancelledRef}
+
+              rebuildCaptured={rebuildCaptured}
             />
           </div>
         </div>
