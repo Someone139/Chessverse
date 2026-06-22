@@ -194,13 +194,13 @@ export default function Home() {
         </div>
       )}
       {page === "Game" && (
-        <div className="grid grid-rows-[70px_1fr] min-h-screen min-w-screen text-white">
+        <div className="grid grid-rows-[70px_1fr] min-h-screen min-w-screen">
           {/* Top Bar */}
           <TopBar
             setPage={setPage}
           />
 
-          <div className="grid grid-cols-3 h-[calc(100vh-70px)] gap-2 bg-gradient-to-b from-bg1 to-bg2 overflow-hidden">
+          <div className="grid grid-cols-3 h-[calc(100vh-70px)] gap-2 bg-background-50 overflow-hidden">
             {/* Move History */}
             <MoveHistory
               moves={moves}

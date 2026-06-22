@@ -32,21 +32,21 @@ export default function MoveHistory({
     rebuildCaptured,
 }: Props) {
     return(
-        <div className="m-5 w-[400px] rounded-xl bg-surfaceDark p-4 overflow-hidden flex flex-col h-[95%]">
-            <h2 className="mb-2 text-3xl text-text font-bold self-center justify-self-center">
+        <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
+            <h2 className="mb-2 text-3xl text-text-950 font-bold self-center justify-self-center">
             Move History
             </h2>
 
             <div
             ref={moveHistoryRef}
-            className="mt-5 text-white overflow-y-auto flex-1 pr-2 min-h-0"
+            className="mt-5 text-text-900 overflow-y-auto flex-1 pr-2 min-h-0"
             >
-                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 text-textMuted overflow-y-auto flex-1 pr-2 min-h-0 content-start p-1">
+                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 overflow-y-auto flex-1 pr-2 min-h-0 content-start p-1">
                     {Array.from({ length: Math.ceil(moves.length / 2) }).map((_, index) => (
                     <Fragment key={index}>
                         
                         {/* index */}
-                        <div className="bg-surface pl-1 shadow w-full px-2 flex items-center h-8 rounded-sm">
+                        <div className="bg-background-200 pl-1 shadow w-full px-2 flex items-center h-8 rounded-sm">
                         {index + 1}.
                         </div>
 
@@ -71,10 +71,10 @@ export default function MoveHistory({
 
                         setViewIndex(clickedIndex);
                         }}
-                        className={`bg-surface pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-accent transition-all duration-200 ${
+                        className={`bg-background-200 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-background-300 transition-all duration-200 ${
                         viewIndex === index * 2 ||
                         (viewIndex === null && index * 2 === moves.length - 1)
-                            ? "ring-2 ring-accent"
+                            ? "ring-2 ring-accent-500"
                             : ""
                         }`}
                         >
@@ -103,10 +103,10 @@ export default function MoveHistory({
                             
                             setViewIndex(clickedIndex);
                         }}
-                        className={`bg-surface pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-accent transition-all duration-200 ${
+                        className={`bg-background-200 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-background-300 transition-all duration-200 ${
                         viewIndex === index * 2 + 1 ||
                         (viewIndex === null && index * 2 + 1 === moves.length - 1)
-                            ? "ring-2 ring-accent"
+                            ? "ring-2 ring-accent-500"
                             : ""
                         }`}
                         >
@@ -129,9 +129,9 @@ export default function MoveHistory({
                 syncUI(replay, null)
                 rebuildCaptured(replay)
             }}
-            className="bg-surface p-3 shadow shadow-black/50 border border-buttonBorder rounded-lg cursor-pointer hover:bg-accent transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface/50 disabled:hover:shadow-black/50"
+            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
             >
-                <ChevronFirst size={40}/>
+                <ChevronFirst size={40} className="text-text-950"/>
             </button>
 
             <button
@@ -158,9 +158,9 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-surface p-3 shadow shadow-black/50 border border-buttonBorder rounded-lg cursor-pointer hover:bg-accent transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface/50 disabled:hover:shadow-black/50"
+            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
             >
-                <ChevronLeft size={40}/>
+                <ChevronLeft size={40} className="text-text-950"/>
             </button>
 
             <button
@@ -187,9 +187,9 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-surface p-3 shadow shadow-black/50 border border-buttonBorder rounded-lg cursor-pointer hover:bg-accent transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface/50 disabled:hover:shadow-black/50"
+            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
             >
-                <ChevronRight size={40}/>
+                <ChevronRight size={40} className="text-text-950"/>
             </button>
 
             <button
@@ -214,9 +214,9 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-surface p-3 shadow shadow-black/50 border border-buttonBorder rounded-lg cursor-pointer hover:bg-accent transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface/50 disabled:hover:shadow-black/50"
+            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
             >
-                <ChevronLast size={40}/>
+                <ChevronLast size={40} className="text-text-950"/>
             </button>
             </div>
         </div>
