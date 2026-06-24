@@ -34,7 +34,7 @@ export default function ChessBoard({
             {boardOrientation === "black" &&
             <div className="flex gap-0.5 h-[20px] flex-nowrap">
                 {captured.b.map((p, i) => (
-                <span key={i} className="text-lg opacity-80">
+                <span key={i} className="text-lg opacity-80 text-text-950">
                     {getPieceSymbol(p)}
                 </span>
                 ))}
@@ -43,7 +43,7 @@ export default function ChessBoard({
             {boardOrientation === "white" &&
             <div className="flex gap-0.5 h-[20px] flex-nowrap">
                 {captured.w.map((p, i) => (
-                <span key={i} className="text-lg opacity-80">
+                <span key={i} className="text-lg opacity-80 text-text-950">
                     {getPieceSymbol(p)}
                 </span>
                 ))}
@@ -100,19 +100,19 @@ export default function ChessBoard({
             }}
         />
         <div className="flex w-full h-[20px] mt-0.5">
-            {boardOrientation === "white" &&
-            <div className="flex gap-0.5 h-[20px] flex-nowrap">
+            {boardOrientation === "black" &&
+            <div className="flex gap-0.5 mt-0.5 h-[20px] flex-nowrap">
                 {captured.b.map((p, i) => (
-                <span key={i}>
+                <span key={i} className="text-lg opacity-80 text-text-950">
                     {getPieceSymbol(p)}
                 </span>
                 ))}
             </div>
             }
-            {boardOrientation === "black" &&
-            <div className="flex gap-0.5 h-[20px] flex-nowrap">
+            {boardOrientation === "white" &&
+            <div className="flex gap-0.5 mt-0.5 h-[20px] flex-nowrap">
                 {captured.w.map((p, i) => (
-                <span key={i}>
+                <span key={i} className="text-lg opacity-80 text-text-950">
                     {getPieceSymbol(p)}
                 </span>
                 ))}

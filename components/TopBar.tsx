@@ -1,6 +1,6 @@
 "use client";
 
-import { ChessKing, Swords, Puzzle, BookOpen, ChartNoAxesCombined, Trophy, Settings, User } from "lucide-react";
+import { ChessKing, HandCoins, User, Settings } from "lucide-react";
 
 type Props = {
   setPage: (page: string) => void;
@@ -8,80 +8,75 @@ type Props = {
 
 export default function TopBar({ setPage }: Props) {
   return (
-    <header className="flex justify-between items-center gap-2 min-w-screen px-4 h-full border-b border-border bg-background-100">
-        <div className="flex items-center ml-2">
+    <header className="grid grid-cols-2 items-center min-w-screen px-4 h-full border-b border-border bg-background-100">
+        <div className="flex items-center justify-self-start ml-2">
             {/* Button to home page (LEFT)*/}
             <button
             onClick={() => setPage("Home")}
-            className="flex gap-1.5 cursor-pointer py-3 px-1 rounded-lg"
+            className="flex gap-1.5 cursor-pointer items-center py-3 px-1 rounded-lg text-text-950 hover:text-primary-500 transition-all duration-200"
             >
-            <ChessKing size={30} className="-mt-0.5 text-text-950"/>
-            <div className="font-bold text-text-950 text-2xl">
+            <ChessKing size={30} className="-mt-1.5"/>
+            <div className="font-bold text-2xl">
                 Chessverse
             </div>
             </button>
+            {/* Other buttons (CENTER)*/}
+            <div className="flex items-center ml-5">
+                {/* Play button */}
+                <button
+                onClick={() => setPage("Game")}
+                className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
+                >
+                <p className="text-base text-text-900 font-semibold">Play</p>
+                </button>
+                {/* Puzzles */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
+                >
+                <p className="text-base text-text-900 font-semibold">Puzzles</p>
+                </button>
+                {/* Learn */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
+                >
+                <p className="text-base text-text-900 font-semibold">Learn</p>
+                </button>
+                {/* Stats */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
+                >
+                <p className="text-base text-text-900 font-semibold">Statistics</p>
+                </button>
+                {/* Leaderboard */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
+                >
+                <p className="text-base text-text-900 font-semibold">Leaderboard</p>
+                </button>
+                {/* Donate */}
+                <button
+                onClick={() => setPage("Home")}
+                className="flex cursor-pointer items-center rounded-lg gap-1 px-3 py-3 hover:bg-accent-200/50 transition-all duration-200 text-accent-500"
+                >
+                <HandCoins size={20} />
+                <p className="text-base font-semibold">Donate</p>
+                </button>
+            </div>
         </div>
-        {/* Other buttons (CENTER)*/}
-        <div className="flex items-center gap-5">
-            {/* Play button */}
-            <button
-            onClick={() => setPage("Game")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <Swords size={18} className="mt-[5px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Play</p>
-            </button>
-            {/* Puzzles */}
-            <button
-            onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <Puzzle size={18} className="mt-[4px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Puzzles</p>
-            </button>
-            {/* Learn */}
-            <button
-            onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <BookOpen size={18} className="mt-[5px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Learn</p>
-            </button>
-            {/* Stats */}
-            <button
-            onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <ChartNoAxesCombined size={18} className="mt-[4px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Statistics</p>
-            </button>
-            {/* Leaderboard */}
-            <button
-            onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <Trophy size={18} className="mt-[4px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Leaderboard</p>
-            </button>
-            {/* Settings */}
-            <button
-            onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1 bg-background-50 rounded-lg px-6 py-3 hover:bg-background-200 transition-all duration-200"
-            >
-            <Settings size={18} className="mt-[4px] text-text-900"/>
-            <p className="text-lg text-text-900 font-semibold">Settings</p>
-            </button>
-        </div>
-        <div className="flex items-center ml-2">
+        <div className="flex items-center justify-self-end ml-2">
             {/* Profile Button (RIGHT)*/}
             <button
             onClick={() => setPage("Home")}
-            className="flex cursor-pointer border border-border gap-1.5 bg-background-50 rounded-lg px-8 py-3 hover:bg-background-300 transition-all duration-200"
+            className="flex cursor-pointer items-center border border-border gap-1.5 bg-background-50 rounded-lg px-8 py-3 hover:bg-background-300 transition-all duration-200"
             >
             <User size={30} className="-mt-0.5 text-text-950"/>
-            <div className="font-semibold text-lg text-text-950">
+            <p className="font-semibold text-base text-text-950">
                 Profile
-            </div>
+            </p>
             </button>
         </div>
     </header>

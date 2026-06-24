@@ -45,7 +45,7 @@ export default function GameTools({
     rebuildCaptured,
 }: Props) {
     return(
-        <div className="m-5 w-[400px] rounded-xl bg-[#412B6B] p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
+        <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
             <h2 className="mb-2 text-3xl font-bold self-center justify-self-center">
                 Game Tools
             </h2>
@@ -63,7 +63,7 @@ export default function GameTools({
                 );
             }
             }}
-            className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#FF0000]/80 transition-all duration-200"
+            className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#ff0000] transition-all duration-200"
             >
                 <Flag size={30} />
                 <p>Resign</p>
@@ -80,7 +80,7 @@ export default function GameTools({
                 setStatus("Draw agreed.");
             }
             }}
-            className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+            className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-secondary-500 transition-all duration-200"
             >
                 <Handshake size={30} />
                 <p>Offer Draw</p>
@@ -119,7 +119,7 @@ export default function GameTools({
             syncUI(replay, null);
             rebuildCaptured(replay)
             }}
-            className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+            className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-secondary-500 transition-all duration-200"
             >
                 <Undo2 size={30} className="mb-1.5"/>
                 <p>Take Back</p>
@@ -133,7 +133,7 @@ export default function GameTools({
                 boardOrientation === "white" ? "black" : "white"
             )
             }
-            className="flex items-center shadow justify-center bg-[#5C3E94] rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+            className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-secondary-500 transition-all duration-200"
             >
                 <RefreshCcw size={30} className="mb-1"/>
                 <p>Flip Board</p>

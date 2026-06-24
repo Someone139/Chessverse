@@ -46,7 +46,7 @@ export default function MoveHistory({
                     <Fragment key={index}>
                         
                         {/* index */}
-                        <div className="bg-background-200 pl-1 shadow w-full px-2 flex items-center h-8 rounded-sm">
+                        <div className="bg-secondary-400 pl-1 shadow w-full px-2 flex items-center h-8 rounded-sm">
                         {index + 1}.
                         </div>
 
@@ -71,7 +71,7 @@ export default function MoveHistory({
 
                         setViewIndex(clickedIndex);
                         }}
-                        className={`bg-background-200 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-background-300 transition-all duration-200 ${
+                        className={`bg-secondary-400 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-secondary-500 transition-all duration-200 ${
                         viewIndex === index * 2 ||
                         (viewIndex === null && index * 2 === moves.length - 1)
                             ? "ring-2 ring-accent-500"
@@ -103,7 +103,7 @@ export default function MoveHistory({
                             
                             setViewIndex(clickedIndex);
                         }}
-                        className={`bg-background-200 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-background-300 transition-all duration-200 ${
+                        className={`bg-secondary-400 pl-2 shadow w-full px-2 flex items-center h-8 rounded-sm cursor-pointer hover:bg-secondary-500 transition-all duration-200 ${
                         viewIndex === index * 2 + 1 ||
                         (viewIndex === null && index * 2 + 1 === moves.length - 1)
                             ? "ring-2 ring-accent-500"
@@ -129,7 +129,7 @@ export default function MoveHistory({
                 syncUI(replay, null)
                 rebuildCaptured(replay)
             }}
-            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
+            className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronFirst size={40} className="text-text-950"/>
             </button>
@@ -158,7 +158,7 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
+            className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronLeft size={40} className="text-text-950"/>
             </button>
@@ -187,7 +187,7 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
+            className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronRight size={40} className="text-text-950"/>
             </button>
@@ -214,7 +214,7 @@ export default function MoveHistory({
                 syncUI(replay, moveSquares);
                 rebuildCaptured(replay);
             }}
-            className="bg-background-200 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-background-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background-300/50 disabled:hover:shadow-black/50"
+            className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronLast size={40} className="text-text-950"/>
             </button>

@@ -30,18 +30,18 @@ export default function Timer({
   }
 
   return (
-    <div className="grid grid-cols-3 w-[500px] h-[80px] bg-[#412B6B] items-center rounded-xl">
+    <div className="grid grid-cols-3 w-[500px] h-[80px] bg-background-100 items-center rounded-xl">
       
       {/* Left label */}
       <div className="flex text-center justify-self-start ml-5">
-        <ChessKing size={40} className="self-center -mt-2" />
-        <p className="text-2xl font-semibold self-center ml-2">
+        <ChessKing size={40} className="self-center -mt-2 text-text-950" />
+        <p className="text-2xl font-semibold self-center ml-2 text-text-950">
           {atBottom === true ? "White" : "Black"}
         </p>
       </div>
 
       {/* Timer */}
-      <p className="text-4xl font-semibold justify-self-center self-center">
+      <p className="text-4xl font-semibold justify-self-center self-center text-text-950">
         {atBottom === true
           ? formatTime(whiteTime)
           : formatTime(blackTime)}
@@ -51,16 +51,16 @@ export default function Timer({
       {atBottom === true ? (
         <button
           onClick={() => setWhiteTime((t) => t + 15)}
-          className="bg-[#5C3E94] rounded-lg shadow items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:scale-105 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+          className="bg-secondary-400 rounded-lg items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:bg-secondary-500 transition-all duration-200"
         >
-          <Plus size={40} color="#211832" />
+          <Plus size={40} className="text-background-50" />
         </button>
       ) : (
         <button
           onClick={() => setBlackTime((t) => t + 15)}
-          className="bg-[#5C3E94] rounded-lg shadow items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:scale-105 hover:bg-[#5C3E94]/50 hover:shadow-[#F25912]/80 transition-all duration-200"
+          className="bg-secondary-400 rounded-lg items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:bg-secondary-500 transition-all duration-200"
         >
-          <Plus size={40} color="#211832" />
+          <Plus size={40} className="text-background-50" />
         </button>
       )}
     </div>

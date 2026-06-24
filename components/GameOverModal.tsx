@@ -14,7 +14,7 @@ export default function GameOverModal({
   if (!showModal || !status) return null;
 
   return (
-    <div className="fixed flex flex-col justify-between items-center p-5 top-[40%] left-[50%] -translate-x-1/2 z-50 rounded-xl bg-[#412B6B] w-200 h-60 shadow-2xl border border-[#5C3E94]">
+    <div className="fixed flex flex-col justify-between items-center p-5 top-[40%] left-[50%] -translate-x-1/2 z-50 rounded-xl bg-primary-400 w-200 h-60 shadow-2xl border border-[#5C3E94]">
         <p className="text-4xl font-bold text-center">{status}</p>
         <button
         onClick={newGame}

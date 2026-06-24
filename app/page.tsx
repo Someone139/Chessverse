@@ -251,6 +251,7 @@ export default function Home() {
               />
             </div>
             {/* Game Tools */}
+            {/* div this and place the GameOverModal underneath */}
             <GameTools
               gameOver={gameOver}
               setGameOver={setGameOver}
