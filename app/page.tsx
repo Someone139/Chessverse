@@ -10,6 +10,7 @@ import MoveHistory from '@/components/MoveHistory';
 import GameTools from '@/components/GameTools';
 import Timer from '@/components/Timer';
 import HomePage from '@/components/HomePage';
+import GameInfo from '@/components/GameInfo';
 import { useChessGame } from '@/components/useChessGame';
 
 export default function Home() {
@@ -181,7 +182,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen text-white justify-center">
       {page === "Home" && (
-        <div className="min-h-screen min-w-screen grid grid-rows-[70px_1fr]">
+        <div className="min-h-screen min-w-screen grid grid-rows-[65px_1fr]">
           {/* Top Bar */}
           <TopBar
             setPage={setPage}
@@ -194,13 +195,13 @@ export default function Home() {
         </div>
       )}
       {page === "Game" && (
-        <div className="grid grid-rows-[70px_1fr] min-h-screen min-w-screen">
+        <div className="grid grid-rows-[65px_1fr] min-h-screen min-w-screen">
           {/* Top Bar */}
           <TopBar
             setPage={setPage}
           />
 
-          <div className="grid grid-cols-3 h-[calc(100vh-70px)] gap-2 bg-background-50 overflow-hidden">
+          <div className="grid grid-cols-3 h-[calc(100vh-65px)] gap-2 bg-background-50 overflow-hidden">
             {/* Move History */}
             <MoveHistory
               moves={moves}
@@ -251,30 +252,34 @@ export default function Home() {
               />
             </div>
             {/* Game Tools */}
-            {/* div this and place the GameOverModal underneath */}
-            <GameTools
-              gameOver={gameOver}
-              setGameOver={setGameOver}
-              setShowModal={setShowModal}
-              setStatus={setStatus}
-              turn={turn}
+            <div className="grid grid-rows-2 justify-self-end h-[calc(100vh-65px)] gap-4">
+              <GameTools
+                gameOver={gameOver}
+                setGameOver={setGameOver}
+                setShowModal={setShowModal}
+                setStatus={setStatus}
+                turn={turn}
 
-              moves={moves}
-              setMoves={setMoves}
-              viewIndex={viewIndex}
-              setViewIndex={setViewIndex}
-              setIsViewingHistory={setIsViewingHistory}
+                moves={moves}
+                setMoves={setMoves}
+                viewIndex={viewIndex}
+                setViewIndex={setViewIndex}
+                setIsViewingHistory={setIsViewingHistory}
 
-              gameRef={gameRef}
-              syncUI={syncUI}
+                gameRef={gameRef}
+                syncUI={syncUI}
 
-              boardOrientation={boardOrientation}
-              setBoardOrientation={setBoardOrientation}
+                boardOrientation={boardOrientation}
+                setBoardOrientation={setBoardOrientation}
 
-              aiCancelledRef={aiCancelledRef}
+                aiCancelledRef={aiCancelledRef}
 
-              rebuildCaptured={rebuildCaptured}
-            />
+                rebuildCaptured={rebuildCaptured}
+              />
+              <GameInfo 
+                turn={turn}
+              />
+            </div>
           </div>
         </div>
       )}

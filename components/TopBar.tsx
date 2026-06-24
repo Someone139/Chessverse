@@ -71,9 +71,9 @@ export default function TopBar({ setPage }: Props) {
             {/* Profile Button (RIGHT)*/}
             <button
             onClick={() => setPage("Home")}
-            className="flex cursor-pointer items-center border border-border gap-1.5 bg-background-50 rounded-lg px-8 py-3 hover:bg-background-300 transition-all duration-200"
+            className="flex cursor-pointer items-center border border-border gap-1 bg-background-50 rounded-lg px-8 py-3 hover:bg-background-300 transition-all duration-200"
             >
-            <User size={30} className="-mt-0.5 text-text-950"/>
+            <User size={25} className="-mt-0.5 text-text-950"/>
             <p className="font-semibold text-base text-text-950">
                 Profile
             </p>

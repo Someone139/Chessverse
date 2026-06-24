@@ -61,7 +61,7 @@
   --color-accent-900: var(--accent-900);
   --color-accent-950: var(--accent-950);
 
-  --color-border: #1a2728;
+  --color-border: #666666;
 }
 
 :root {
