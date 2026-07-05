@@ -13,11 +13,20 @@ import HomePage from '@/components/HomePage';
 import GameInfo from '@/components/GameInfo';
 import { useChessGame } from '@/components/useChessGame';
 
+export type TimeControl = {
+  id: string;
+  name: string;
+  base: number;
+  increment: number;
+  type: string;
+};
+
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [showPromotion, setShowPromotion] = useState(false);
   const [isViewingHistory, setIsViewingHistory] = useState(false);
+  const [selectedTimeControl, setSelectedTimeControl] = useState<TimeControl | null>(null);
   const [promotionMove, setPromotionMove] = useState<{
     from: string;
     to: string;
@@ -58,6 +67,7 @@ export default function Home() {
     onSquareClick,
     makeMove,
     handlePromotion,
+    applyIncrement,
   } = useChessGame({
     promotionMove,
     setShowPromotion,
@@ -70,6 +80,8 @@ export default function Home() {
     setShowModal,
 
     setIsViewingHistory,
+
+    selectedTimeControl,
   });
   const [page, setPage] = useState<string>("Home");
 
@@ -166,9 +178,11 @@ export default function Home() {
       if (aiCancelledRef.current) return;
 
       syncUI(gameRef.current, { from, to });
-      
-      setHistory(prev => [...prev, gameRef.current.fen()]);
+
       setMoves(prev => [...prev, validatedMove.san]);
+      setHistory(prev => [...prev, gameRef.current.fen()]);
+      
+      applyIncrement("b");
 
       updateGameState();
     }, 500);
@@ -191,6 +205,8 @@ export default function Home() {
           {/* Home Page */}
           <HomePage
             setPage={setPage}
+            selectedTimeControl={selectedTimeControl}
+            setSelectedTimeControl={setSelectedTimeControl}
           />
         </div>
       )}
@@ -278,6 +294,7 @@ export default function Home() {
               />
               <GameInfo 
                 turn={turn}
+                selectedTimeControl={selectedTimeControl}
               />
             </div>
           </div>

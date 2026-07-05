@@ -1,9 +1,13 @@
+import type { TimeControl } from "@/app/page";
+
 type Props = {
     turn: "w" | "b";
+    selectedTimeControl: TimeControl | null;
 };
 
 export default function GameInfo({
     turn,
+    selectedTimeControl,
 }:Props) {
   return (
     <div className="m-5 w-[400px] flex-1 justify-self-end rounded-xl overflow-auto bg-background-100 border border-border p-5 flex flex-col">
@@ -26,7 +30,7 @@ export default function GameInfo({
                     Time Control
                 </p>
                 <p className="mt-1 text-lg font-semibold text-text-950">
-                    10 + 0
+                    {selectedTimeControl?.name}
                 </p>
             </div>
 

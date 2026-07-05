@@ -100,7 +100,7 @@ export default function ChessBoard({
             }}
         />
         <div className="flex w-full h-[20px] mt-0.5">
-            {boardOrientation === "black" &&
+            {boardOrientation === "white" &&
             <div className="flex gap-0.5 mt-0.5 h-[20px] flex-nowrap">
                 {captured.b.map((p, i) => (
                 <span key={i} className="text-lg opacity-80 text-text-950">
@@ -109,7 +109,7 @@ export default function ChessBoard({
                 ))}
             </div>
             }
-            {boardOrientation === "white" &&
+            {boardOrientation === "black" &&
             <div className="flex gap-0.5 mt-0.5 h-[20px] flex-nowrap">
                 {captured.w.map((p, i) => (
                 <span key={i} className="text-lg opacity-80 text-text-950">

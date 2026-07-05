@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Chess } from "chess.js";
 import type { Square } from "chess.js";
 
@@ -16,6 +16,8 @@ export function useChessGame({
     setShowModal,
 
     setIsViewingHistory,
+
+    selectedTimeControl,
 }: any) {
     const [game, setGame] = useState(new Chess());
     const gameRef = useRef(new Chess());
@@ -34,8 +36,17 @@ export function useChessGame({
 
     const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
 
-    const [whiteTime, setWhiteTime] = useState(600);
-    const [blackTime, setBlackTime] = useState(600);
+    const defaultTime = selectedTimeControl?.base ?? 600;
+
+    const [whiteTime, setWhiteTime] = useState<number>(defaultTime);
+    const [blackTime, setBlackTime] = useState<number>(defaultTime);
+
+    useEffect(() => {
+        if (!selectedTimeControl) return;
+
+        setWhiteTime(selectedTimeControl.base);
+        setBlackTime(selectedTimeControl.base);
+    }, [selectedTimeControl]);
 
     const [captured, setCaptured] = useState<{
         w: string[];
@@ -58,6 +69,20 @@ export function useChessGame({
         rebuildCaptured(gameRef.current);
     }
 
+    // INCREMENT
+    function applyIncrement(color: "w" | "b") {
+        if (!selectedTimeControl) return;
+
+        const inc = selectedTimeControl.increment;
+
+        if (color === "w") {
+            setWhiteTime(t => t + inc);
+        } else {
+            setBlackTime(t => t + inc);
+        }
+    }
+
+    // REBUILD CAPTURED PIECES
     function rebuildCaptured(game: Chess) {
         const replay = new Chess();
 
@@ -134,6 +159,8 @@ export function useChessGame({
 
         setMoves(prev => [...prev, move.san]);
         setHistory(prev => [...prev, gameCopy.fen()]);
+
+        applyIncrement(gameCopy.turn() === "w" ? "b" : "w");
 
         updateGameState()
 
@@ -347,6 +374,8 @@ export function useChessGame({
 
         setHistory(prev => [...prev, gameCopy.fen()]);
 
+        applyIncrement(gameCopy.turn() === "w" ? "b" : "w");
+
         updateGameState();
 
         setShowPromotion(false);
@@ -390,5 +419,6 @@ export function useChessGame({
     onSquareClick,
     makeMove,
     handlePromotion,
+    applyIncrement,
   };
 }
