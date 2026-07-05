@@ -12,10 +12,10 @@ export default function TopBar({ setPage }: Props) {
         <div className="flex items-center justify-self-start ml-2">
             {/* Button to home page (LEFT)*/}
             <button
-            onClick={() => setPage("Home")}
-            className="flex gap-1.5 cursor-pointer items-center py-3 px-1 rounded-lg text-text-950 hover:text-primary-500 transition-all duration-200"
+            onClick={() => window.location.reload()}
+            className="group flex gap-1.5 cursor-pointer items-center py-3 px-1 rounded-lg text-text-950 hover:text-primary-500 transition-all duration-200"
             >
-            <ChessKing size={30} className="-mt-1.5"/>
+            <ChessKing size={30} className="-mt-1.5 group-hover:rotate-90 transition-transform duration-500"/>
             <div className="font-bold text-2xl">
                 Chessverse
             </div>

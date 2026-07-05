@@ -30,7 +30,7 @@ export default function GameInfo({
                     Time Control
                 </p>
                 <p className="mt-1 text-lg font-semibold text-text-950">
-                    {selectedTimeControl?.name}
+                    {selectedTimeControl ? selectedTimeControl.id : "10 + 0"}
                 </p>
             </div>
 
