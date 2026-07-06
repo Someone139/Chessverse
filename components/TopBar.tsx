@@ -27,35 +27,35 @@ export default function TopBar({ setPage }: Props) {
                 onClick={() => setPage("Game")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
-                <p className="text-base text-text-900 font-semibold">Play</p>
+                <span className="text-base text-text-900 font-semibold">Play</span>
                 </button>
                 {/* Puzzles */}
                 <button
                 onClick={() => setPage("Home")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
-                <p className="text-base text-text-900 font-semibold">Puzzles</p>
+                <span className="text-base text-text-900 font-semibold">Puzzles</span>
                 </button>
                 {/* Learn */}
                 <button
                 onClick={() => setPage("Home")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
-                <p className="text-base text-text-900 font-semibold">Learn</p>
+                <span className="text-base text-text-900 font-semibold">Learn</span>
                 </button>
                 {/* Stats */}
                 <button
                 onClick={() => setPage("Home")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
-                <p className="text-base text-text-900 font-semibold">Statistics</p>
+                <span className="text-base text-text-900 font-semibold">Statistics</span>
                 </button>
                 {/* Leaderboard */}
                 <button
                 onClick={() => setPage("Home")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
-                <p className="text-base text-text-900 font-semibold">Leaderboard</p>
+                <span className="text-base text-text-900 font-semibold">Leaderboard</span>
                 </button>
                 {/* Donate */}
                 <button
@@ -63,7 +63,7 @@ export default function TopBar({ setPage }: Props) {
                 className="flex cursor-pointer items-center rounded-lg gap-1 px-3 py-3 hover:bg-accent-200/50 transition-all duration-200 text-accent-500"
                 >
                 <HandCoins size={20} />
-                <p className="text-base font-semibold">Donate</p>
+                <span className="text-base font-semibold">Donate</span>
                 </button>
             </div>
         </div>
@@ -74,9 +74,9 @@ export default function TopBar({ setPage }: Props) {
             className="flex cursor-pointer items-center border border-border gap-1 bg-background-50 rounded-lg px-8 py-3 hover:bg-background-300 transition-all duration-200"
             >
             <User size={25} className="-mt-0.5 text-text-950"/>
-            <p className="font-semibold text-base text-text-950">
+            <span className="font-semibold text-base text-text-950">
                 Profile
-            </p>
+            </span>
             </button>
         </div>
     </header>
