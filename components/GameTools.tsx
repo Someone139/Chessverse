@@ -6,6 +6,7 @@ type Props = {
   setGameOver: (v: boolean) => void;
   setShowModal: (v: boolean) => void;
   setStatus: (v: string) => void;
+  setMutedStatus: React.Dispatch<React.SetStateAction<string>>;
   turn: "w" | "b";
 
   moves: string[];
@@ -28,6 +29,7 @@ export default function GameTools({
     setGameOver,
     setShowModal,
     setStatus,
+    setMutedStatus,
     turn,
 
     moves,
@@ -58,9 +60,10 @@ export default function GameTools({
                 setGameOver(true);
                 setShowModal(true)
                 setStatus(turn === "w"
-                ? "White resigned. Black wins!"
-                : "Black resigned. White wins!"
+                ? "Black wins!"
+                : "White wins!"
                 );
+                setMutedStatus("by resignation");
             }
             }}
             className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-[#ff0000] transition-all duration-200"
@@ -77,7 +80,8 @@ export default function GameTools({
                 aiCancelledRef.current = true;
                 setGameOver(true);
                 setShowModal(true);
-                setStatus("Draw agreed.");
+                setStatus("Draw");
+                setMutedStatus("by agreement");
             }
             }}
             className="flex items-center shadow justify-center bg-secondary-400 rounded-lg p-4 cursor-pointer space-x-1 hover:scale-102 hover:bg-secondary-500 transition-all duration-200"

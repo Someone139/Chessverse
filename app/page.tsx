@@ -12,6 +12,7 @@ import Timer from '@/components/Timer';
 import HomePage from '@/components/HomePage';
 import GameInfo from '@/components/GameInfo';
 import { useChessGame } from '@/components/useChessGame';
+// import GameReview from '@/components/GameReview';
 
 export type TimeControl = {
   id: string;
@@ -44,6 +45,8 @@ export default function Home() {
     turn,
     status,
     setStatus,
+    mutedStatus,
+    setMutedStatus,
 
     selectedSquare,
     legalMoves,
@@ -113,7 +116,8 @@ export default function Home() {
       if (turn === "w") {
         setWhiteTime((time) => {
           if (time <= 0) {
-            setStatus("Time's up! Black wins!");
+            setStatus("Black wins!");
+            setMutedStatus("by time")
             setGameOver(true);
             setShowModal(true)
             return 0;
@@ -123,7 +127,8 @@ export default function Home() {
       } else {
         setBlackTime((time) => {
           if (time <= 0) {
-            setStatus("Time's up! White wins!");
+            setStatus("White wins!");
+            setMutedStatus("by time")
             setGameOver(true);
             setShowModal(true)
             return 0;
@@ -274,6 +279,7 @@ export default function Home() {
                 setGameOver={setGameOver}
                 setShowModal={setShowModal}
                 setStatus={setStatus}
+                setMutedStatus={setMutedStatus}
                 turn={turn}
 
                 moves={moves}
@@ -310,9 +316,15 @@ export default function Home() {
         <GameOverModal
           status={status}
           showModal={showModal}
+          setShowModal={setShowModal}
           newGame={newGame}
+          mutedStatus={mutedStatus}
+          setPage={setPage}
         />
       )}
+      {/* {page === "GameReview" && (
+
+      )} */}
     </main>
   );
 }

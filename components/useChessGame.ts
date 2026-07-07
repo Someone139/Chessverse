@@ -30,6 +30,7 @@ export function useChessGame({
 
     const [turn, setTurn] = useState<"w" | "b">("w");
     const [status, setStatus] = useState("");
+    const [mutedStatus, setMutedStatus] = useState("");
 
     const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
     const [legalMoves, setLegalMoves] = useState<string[]>([]);
@@ -179,7 +180,8 @@ export function useChessGame({
         const g = gameRef.current;
 
         if (g.isCheckmate()) {
-            setStatus(`Checkmate! ${g.turn() === "w" ? "Black" : "White"} wins!`);
+            setStatus(`${g.turn() === "w" ? "Black" : "White"} wins!`);
+            setMutedStatus("by checkmate");
             setGameOver(true);
             setShowModal(true);
             return;
@@ -192,12 +194,8 @@ export function useChessGame({
             return;
         }
 
-        if (g.isCheck()) {
-            setStatus(`${g.turn() === "w" ? "White" : "Black"} is in check.`);
-            return;
-        }
-
         setStatus("");
+        setMutedStatus("");
     }
 
     // RESET GAME
@@ -213,6 +211,7 @@ export function useChessGame({
 
         setTurn("w");
         setStatus("");
+        setMutedStatus("");
 
         setSelectedSquare(null);
         setLegalMoves([]);
@@ -395,6 +394,8 @@ export function useChessGame({
     turn,
     status,
     setStatus,
+    mutedStatus,
+    setMutedStatus,
 
     selectedSquare,
     legalMoves,

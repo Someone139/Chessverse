@@ -21,12 +21,20 @@ export default function Timer({
   boardOrientation,
   atBottom,
 }: Props) {
+  let limitTime: number = 10800;
+
   function formatTime(time: number) {
-    return (
-      String(Math.floor(time / 60)).padStart(2, "0") +
-      ":" +
-      String(time % 60).padStart(2, "0")
-    );
+    const hours = Math.floor(time / 3600)
+    const minutes = Math.floor((time % 3600) / 60)
+    const seconds = time % 60
+
+    const formattedHours = String(hours).padStart(2, "0")
+    const formattedMinutes = String(minutes).padStart(2, "0")
+    const formattedSeconds = String(seconds).padStart(2, "0")
+
+    return hours > 0
+      ? `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+      : `${formattedMinutes}:${formattedSeconds}`
   }
 
   return (
@@ -50,14 +58,28 @@ export default function Timer({
       {/* Add time */}
       {atBottom === true ? (
         <button
-          onClick={() => setWhiteTime((t) => t + 15)}
+          onClick={() => {
+            if (whiteTime <= (limitTime - 15)){
+              setWhiteTime((t) => t + 15)
+            }
+            else if (whiteTime > (limitTime - 15) && whiteTime <= limitTime){
+              setWhiteTime(limitTime)
+            }
+          }}
           className="bg-secondary-400 rounded-lg items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:bg-secondary-500 transition-all duration-200"
         >
           <Plus size={40} className="text-background-50" />
         </button>
       ) : (
         <button
-          onClick={() => setBlackTime((t) => t + 15)}
+          onClick={() => {
+            if (blackTime <= (limitTime - 15)){
+              setBlackTime((t) => t + 15)
+            }
+            else if (blackTime > (limitTime - 15) && blackTime <= limitTime){
+              setBlackTime(limitTime)
+            }
+          }}
           className="bg-secondary-400 rounded-lg items-center justify-center self-center justify-self-end cursor-pointer w-10 h-10 mr-5 hover:bg-secondary-500 transition-all duration-200"
         >
           <Plus size={40} className="text-background-50" />
