@@ -47,8 +47,8 @@ export default function GameTools({
     rebuildCaptured,
 }: Props) {
     return(
-        <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col justify-self-end self-start gap-2">
-            <h2 className="mb-2 text-3xl font-bold self-center justify-self-center">
+        <div className="w-[400px] rounded-xl bg-background-100 h-full p-3 overflow-hidden flex flex-col justify-self-end self-start gap-3">
+            <h2 className="text-3xl font-bold self-center justify-self-center">
                 Game Tools
             </h2>
 

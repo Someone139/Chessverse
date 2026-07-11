@@ -10,31 +10,13 @@ export default function GameInfo({
     selectedTimeControl,
 }:Props) {
   return (
-    <div className="m-5 w-[400px] flex-1 justify-self-end rounded-xl overflow-auto bg-background-100 border border-border p-5 flex flex-col">
+    <div className="w-[400px] flex-1 gap-3 h-full justify-self-end rounded-xl overflow-auto bg-background-100 border border-border p-3 flex flex-col">
         <h2 className="text-3xl font-bold text-center text-text-950">
             Game Info
         </h2>
 
-        <div className="mt-6 flex flex-col gap-4">
-            <div className="rounded-lg bg-background-200 border border-border p-4">
-                <p className="text-sm text-text-600 uppercase tracking-wide">
-                    Opponent
-                </p>
-                <p className="mt-1 text-lg font-semibold text-text-950">
-                    Stockfish
-                </p>
-            </div>
-
-            <div className="rounded-lg bg-background-200 border border-border p-4">
-                <p className="text-sm text-text-600 uppercase tracking-wide">
-                    Time Control
-                </p>
-                <p className="mt-1 text-lg font-semibold text-text-950">
-                    {selectedTimeControl ? selectedTimeControl.id : "10 + 0"}
-                </p>
-            </div>
-
-            <div className="rounded-lg bg-background-200 border border-border p-4">
+        <div className="flex flex-col gap-4">
+            <div className="rounded-lg bg-background-200 border border-border p-3">
                 <p className="text-sm text-text-600 uppercase tracking-wide">
                     Variant
                 </p>
@@ -43,7 +25,16 @@ export default function GameInfo({
                 </p>
             </div>
 
-            <div className="rounded-lg bg-background-200 border border-border p-4">
+            <div className="rounded-lg bg-background-200 border border-border p-3">
+                <p className="text-sm text-text-600 uppercase tracking-wide">
+                    Time Control
+                </p>
+                <p className="mt-1 text-lg font-semibold text-text-950">
+                    {selectedTimeControl ? selectedTimeControl.id : "10 + 0"}
+                </p>
+            </div>
+
+            <div className="rounded-lg bg-background-200 border border-border p-3">
                 <p className="text-sm text-text-600 uppercase tracking-wide">
                     Status
                 </p>

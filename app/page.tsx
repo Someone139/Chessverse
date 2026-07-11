@@ -12,7 +12,7 @@ import Timer from '@/components/Timer';
 import HomePage from '@/components/HomePage';
 import GameInfo from '@/components/GameInfo';
 import { useChessGame } from '@/components/useChessGame';
-// import GameReview from '@/components/GameReview';
+import GameReview from '@/components/GameReview';
 
 export type TimeControl = {
   id: string;
@@ -273,7 +273,7 @@ export default function Home() {
               />
             </div>
             {/* Game Tools */}
-            <div className="grid grid-rows-2 justify-self-end h-[calc(100vh-65px)] gap-4">
+            <div className="grid grid-rows-2 justify-self-end h-[calc(100vh-65px)] gap-4 p-5">
               <GameTools
                 gameOver={gameOver}
                 setGameOver={setGameOver}
@@ -322,9 +322,18 @@ export default function Home() {
           setPage={setPage}
         />
       )}
-      {/* {page === "GameReview" && (
+      {page === "GameReview" && (
+        <div className="grid grid-rows-[65px_1fr] min-h-screen min-w-screen">
+          <TopBar
+            setPage={setPage}
+          />
 
-      )} */}
+          <GameReview
+            moves={moves}
+            getPieceSymbol={getPieceSymbol}
+          />
+        </div>
+      )}
     </main>
   );
 }
