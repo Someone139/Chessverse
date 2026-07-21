@@ -1,11 +1,23 @@
 let engine: Worker | null = null;
+let analysisEngine: Worker | null = null;
+
 
 function initStockfish() {
   if (engine) return engine;
+
   engine = new Worker("/stockfish.js");
+
   return engine;
 }
 
+
+function initAnalysisEngine() {
+  if (analysisEngine) return analysisEngine;
+
+  analysisEngine = new Worker("/stockfish.js");
+
+  return analysisEngine;
+}
 
 export function getBestMove(fen: string): Promise<string> {
   const sf = initStockfish();
@@ -18,19 +30,25 @@ export function getBestMove(fen: string): Promise<string> {
 
       if (line === "uciok") {
         sf.postMessage("isready");
+        return;
       }
 
       if (line === "readyok") {
         sf.postMessage(`position fen ${fen}`);
         sf.postMessage("go depth 12");
+        return;
       }
 
       if (line.startsWith("bestmove")) {
+
         sf.removeEventListener(
           "message",
           handler
         );
-        resolve(line.split(" ")[1]);
+
+        resolve(
+          line.split(" ")[1]
+        );
       }
     };
 
@@ -43,58 +61,101 @@ export function getBestMove(fen: string): Promise<string> {
   });
 }
 
-
-
-export function getEvaluation(fen: string): Promise<{
+export function getEvaluation(
+  fen: string
+): Promise<{
   score: number;
   mate: number | null;
+  bestMove: string;
 }> {
-  const sf = initStockfish();
+
+  const sf = initAnalysisEngine();
+  let bestMove = "";
 
   return new Promise((resolve) => {
     let score = 0;
     let mate: number | null = null;
+    let bestDepth = -1;
+    let moves: {
+      move: string;
+      score: number;
+      mate: number | null;
+    }[] = [];
 
     const handler = (event: MessageEvent) => {
       const line = event.data;
 
       if (typeof line !== "string") return;
 
-      if (
-        line.startsWith("info") &&
-        line.includes("score")
-      ) {
+      if (line === "uciok") {
+        sf.postMessage("isready");
+        return;
+      }
+
+      if (line === "readyok") {
+        sf.postMessage(
+          `position fen ${fen}`
+        );
+
+        sf.postMessage(
+          "go depth 12 multipv 3"
+        );
+
+        return;
+      }
+
+      if (line.startsWith("info") && line.includes("multipv")) {
+
         const parts = line.split(" ");
+
+        const depthIndex = parts.indexOf("depth");
+        const multiIndex = parts.indexOf("multipv");
         const scoreIndex = parts.indexOf("score");
+        const pvIndex = parts.indexOf("pv");
 
-        if (scoreIndex !== -1) {
-          const type = parts[scoreIndex + 1];
-          const value = Number(parts[scoreIndex + 2]);
+        if (
+          depthIndex === -1 ||
+          multiIndex === -1 ||
+          scoreIndex === -1 ||
+          pvIndex === -1
+        ) return;
 
-          if (type === "cp") {
-            score = value / 100;
-            mate = null;
-          }
+        const depth = Number(parts[depthIndex + 1]);
 
-          if (type === "mate") {
-            mate = value;
-          }
-        }
+        if (depth < bestDepth) return;
+
+        bestDepth = depth;
+
+        const move = parts[pvIndex + 1];
+        const type = parts[scoreIndex + 1];
+        const value = Number(parts[scoreIndex + 2]);
+
+        moves[Number(parts[multiIndex + 1]) - 1] = {
+          move,
+          score:
+            type === "cp"
+              ? value / 100
+              : 0,
+          mate:
+            type === "mate"
+              ? value
+              : null,
+        };
       }
 
       if (line.startsWith("bestmove")) {
+        bestMove = line.split(" ")[1];
 
         sf.removeEventListener(
           "message",
           handler
         );
 
-
         resolve({
           score,
-          mate
+          mate,
+          bestMove,
         });
-
       }
     };
 
@@ -103,14 +164,36 @@ export function getEvaluation(fen: string): Promise<{
       handler
     );
 
-
-    sf.postMessage(
-      `position fen ${fen}`
-    );
-
-    sf.postMessage(
-      "go depth 12"
-    );
+    sf.postMessage("uci");
 
   });
+}
+
+
+
+
+export async function analysePositions(
+    fens: string[],
+    onProgress?: (current: number, total: number) => void
+) {
+    const evaluations: {
+        score: number;
+        mate: number | null;
+        bestMove: string;
+    }[] = [];
+
+    for (let i = 0; i < fens.length; i++) {
+        const evaluation = await getEvaluation(fens[i]);
+
+        evaluations.push(evaluation);
+
+        if (onProgress) {
+            onProgress(
+                i + 1,
+                fens.length
+            );
+        }
+    }
+
+    return evaluations;
 }

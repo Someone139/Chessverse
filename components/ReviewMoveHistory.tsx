@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from "lucide-react";
 import { Chess } from "chess.js";
 
@@ -42,6 +42,67 @@ export default function ReviewMoveHistory({
         };
     }
 
+    function goToStart() {
+        setCurrentMove(0)
+        setLastMove(null)
+    }
+
+    function goPrevious() {
+        const newMove = currentMove - 1;
+
+        if (newMove >= 0) {
+            setCurrentMove(newMove);
+            setLastMove(getLastMove(newMove));
+        }
+    }
+
+    function goNext() {
+        const newMove = currentMove + 1;
+
+        if (newMove <= moves.length) {
+            setCurrentMove(newMove);
+            setLastMove(getLastMove(newMove));
+        }
+    }
+
+    function goToEnd() {
+        const newMove = moves.length;
+
+        setCurrentMove(newMove);
+        setLastMove(getLastMove(newMove));
+    }
+
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            switch (e.key) {
+                case "ArrowLeft":
+                    e.preventDefault();
+                    goPrevious();
+                    break;
+
+                case "ArrowRight":
+                    e.preventDefault();
+                    goNext();
+                    break;
+
+                case "ArrowUp":
+                    e.preventDefault();
+                    goToStart();
+                    break;
+
+                case "ArrowDown":
+                    e.preventDefault();
+                    goToEnd();
+                    break;
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [currentMove, moves]);
 
     return (
         <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
@@ -122,10 +183,7 @@ export default function ReviewMoveHistory({
 
                 <button
                 disabled={atStart}
-                onClick={() => {
-                    setCurrentMove(0)
-                    setLastMove(null)
-                }}
+                onClick={goToStart}
                 className="
                 bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg
                 cursor-pointer hover:bg-secondary-500 transition-all duration-200
@@ -138,12 +196,7 @@ export default function ReviewMoveHistory({
 
                 <button
                 disabled={atStart}
-                onClick={() => {
-                    const newMove = currentMove - 1;
-
-                    setCurrentMove(newMove);
-                    setLastMove(getLastMove(newMove));
-                }}
+                onClick={goPrevious}
                 className="
                 bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg
                 cursor-pointer hover:bg-secondary-500 transition-all duration-200
@@ -156,12 +209,7 @@ export default function ReviewMoveHistory({
 
                 <button
                 disabled={atEnd}
-                onClick={() => {
-                    const newMove = currentMove + 1;
-
-                    setCurrentMove(newMove);
-                    setLastMove(getLastMove(newMove));
-                }}
+                onClick={goNext}
                 className="
                 bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg
                 cursor-pointer hover:bg-secondary-500 transition-all duration-200
@@ -174,12 +222,7 @@ export default function ReviewMoveHistory({
 
                 <button
                 disabled={atEnd}
-                onClick={() => {
-                    const newMove = moves.length;
-
-                    setCurrentMove(newMove);
-                    setLastMove(getLastMove(newMove));
-                }}
+                onClick={goToEnd}
                 className="
                 bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg
                 cursor-pointer hover:bg-secondary-500 transition-all duration-200

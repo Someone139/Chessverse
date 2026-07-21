@@ -52,7 +52,7 @@ export default function TopBar({ setPage }: Props) {
                 </button>
                 {/* Leaderboard */}
                 <button
-                onClick={() => setPage("Home")}
+                onClick={() => setPage("GameReview")}
                 className="flex cursor-pointer items-center rounded-lg px-3 py-3 hover:bg-background-200 transition-all duration-200"
                 >
                 <span className="text-base text-text-900 font-semibold">Leaderboard</span>

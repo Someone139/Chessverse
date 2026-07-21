@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from "lucide-react"
 
 type Props = {
@@ -31,6 +31,117 @@ export default function MoveHistory({
     moveHistoryRef,
     rebuildCaptured,
 }: Props) {
+    function goToStart() {
+        setIsViewingHistory(true);
+        setViewIndex(-1);
+
+        const replay = new Chess();
+
+        syncUI(replay, null);
+        rebuildCaptured(replay);
+    }
+
+    function goPrevious() {
+        const currentIndex =
+            viewIndex !== null ? viewIndex : moves.length - 1;
+
+        if (currentIndex <= -1) return;
+
+        const newIndex = currentIndex - 1;
+
+        setIsViewingHistory(true);
+        setViewIndex(newIndex);
+
+        const replay = new Chess();
+
+        for (let i = 0; i <= newIndex; i++) {
+            replay.move(moves[i]);
+        }
+
+        const moveSquares = newIndex >= 0
+            ? getMoveSquares(newIndex)
+            : null;
+
+        syncUI(replay, moveSquares);
+        rebuildCaptured(replay);
+    }
+
+    function goNext() {
+        const currentIndex =
+            viewIndex !== null ? viewIndex : -1;
+
+        if (currentIndex >= moves.length - 1) return;
+
+        const newIndex = currentIndex + 1;
+
+        setIsViewingHistory(true);
+        setViewIndex(newIndex);
+
+        const replay = new Chess();
+
+        for (let i = 0; i <= newIndex; i++) {
+            replay.move(moves[i]);
+        }
+
+        const moveSquares = getMoveSquares(newIndex);
+
+        syncUI(replay, moveSquares);
+        rebuildCaptured(replay);
+    }
+
+    function goToEnd() {
+        setIsViewingHistory(false);
+        setViewIndex(null);
+
+        const replay = new Chess();
+
+        for (const san of moves) {
+            replay.move(san);
+        }
+
+        gameRef.current = replay;
+
+        const moveSquares =
+            moves.length > 0
+                ? getMoveSquares(moves.length - 1)
+                : null;
+
+        syncUI(replay, moveSquares);
+        rebuildCaptured(replay);
+    }
+
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            switch (e.key) {
+                case "ArrowLeft":
+                    e.preventDefault();
+                    goPrevious();
+                    break;
+
+                case "ArrowRight":
+                    e.preventDefault();
+                    goNext();
+                    break;
+
+                case "ArrowUp":
+                    e.preventDefault();
+                    goToStart();
+                    break;
+
+                case "ArrowDown":
+                    e.preventDefault();
+                    goToEnd();
+                    break;
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [viewIndex, moves]);
+
     return(
         <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
             <h2 className="mb-2 text-3xl text-text-950 font-bold self-center justify-self-center">
@@ -120,15 +231,7 @@ export default function MoveHistory({
             <div className="flex items-center justify-center gap-x-3 w-full mt-2">
             <button
             disabled={atStart}
-            onClick={() => {
-                setIsViewingHistory(true);
-                setViewIndex(-1);
-
-                const replay = new Chess();
-
-                syncUI(replay, null)
-                rebuildCaptured(replay)
-            }}
+            onClick={goToStart}
             className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronFirst size={40} className="text-text-950"/>
@@ -136,28 +239,7 @@ export default function MoveHistory({
 
             <button
             disabled={atStart}
-            onClick={() => {
-                const currentIndex =
-                viewIndex !== null ? viewIndex : moves.length - 1;
-
-                if (currentIndex <= -1) return;
-
-                const newIndex = currentIndex - 1;
-
-                setIsViewingHistory(true);
-                setViewIndex(newIndex);
-
-                const replay = new Chess();
-
-                for (let i = 0; i <= newIndex; i++) {
-                replay.move(moves[i]);
-                }
-
-                const moveSquares = newIndex >= 0 ? getMoveSquares(newIndex) : null;
-
-                syncUI(replay, moveSquares);
-                rebuildCaptured(replay);
-            }}
+            onClick={goPrevious}
             className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronLeft size={40} className="text-text-950"/>
@@ -165,28 +247,7 @@ export default function MoveHistory({
 
             <button
             disabled={atEnd}
-            onClick={() => {
-                const currentIndex =
-                viewIndex !== null ? viewIndex : -1;
-
-                if (currentIndex >= moves.length - 1) return;
-
-                const newIndex = currentIndex + 1;
-
-                setIsViewingHistory(true);
-                setViewIndex(newIndex);
-
-                const replay = new Chess();
-
-                for (let i = 0; i <= newIndex; i++) {
-                replay.move(moves[i]);
-                }
-
-                const moveSquares = getMoveSquares(newIndex);
-
-                syncUI(replay, moveSquares);
-                rebuildCaptured(replay);
-            }}
+            onClick={goNext}
             className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronRight size={40} className="text-text-950"/>
@@ -194,26 +255,7 @@ export default function MoveHistory({
 
             <button
             disabled={atEnd}
-            onClick={() => {
-                setIsViewingHistory(false);
-                setViewIndex(null);
-
-                const replay = new Chess();
-
-                for (const san of moves) {
-                    replay.move(san);
-                }
-
-                gameRef.current = replay;
-
-                const moveSquares =
-                    moves.length > 0
-                        ? getMoveSquares(moves.length - 1)
-                        : null;
-
-                syncUI(replay, moveSquares);
-                rebuildCaptured(replay);
-            }}
+            onClick={goToEnd}
             className="bg-secondary-400 p-3 shadow shadow-black/50 border border-border rounded-lg cursor-pointer hover:bg-secondary-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary-500/50 disabled:hover:shadow-black/50"
             >
                 <ChevronLast size={40} className="text-text-950"/>
