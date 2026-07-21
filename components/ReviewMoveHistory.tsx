@@ -105,16 +105,16 @@ export default function ReviewMoveHistory({
     }, [currentMove, moves]);
 
     return (
-        <div className="m-5 w-[400px] rounded-xl bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
+        <div className="m-5 w-[400px] rounded-xl justify-self-start bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
 
-            <h2 className="mb-2 text-3xl text-text-950 font-bold self-center justify-self-center">
+            <h2 className="mb-12 text-3xl text-text-950 font-bold self-center justify-self-center">
                 Move History
             </h2>
 
 
-            <div className="mt-5 text-text-900 overflow-y-auto flex-1 pr-2 min-h-0">
+            <div className="text-text-900 overflow-y-auto flex-1 pr-2 min-h-0">
 
-                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 mt-5 overflow-y-auto flex-1 pr-2 min-h-0 content-start p-1">
+                <div className="grid grid-cols-[40px_1fr_1fr] auto-rows-min gap-y-1.5 gap-x-1.5 overflow-y-auto flex-1 pr-2 min-h-0 content-start p-1">
 
                     {Array.from({
                         length: Math.ceil(moves.length / 2)

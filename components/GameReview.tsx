@@ -7,20 +7,22 @@ import ReviewMoveHistory from "@/components/ReviewMoveHistory";
 import EvaluationBar from "@/components/EvaluationBar";
 import { analysePositions } from "@/lib/stockfish";
 import { getOpeningFromMoves, isBookMove } from "@/lib/getOpening";
+import { RefreshCcw, Settings, Share2 } from "lucide-react";
+import { BlunderIcon, BookIcon, BestMoveIcon, ExcellentMoveIcon, InaccuracyMoveIcon, GoodMoveIcon, MistakeMoveIcon, MissMoveIcon, MissedWinMoveIcon, ForcedMoveIcon, CriticalMoveIcon, BrilliantMoveIcon } from "./icons";
 
 type MoveQuality =
     | "Brilliant"
     | "Critical"
-    | "Best"
+    | "The Best Move"
     | "Excellent"
     | "Good"
-    | "Inaccuracy"
-    | "Mistake"
-    | "Blunder"
-    | "Miss"
+    | "An Inaccuracy"
+    | "A Mistake"
+    | "A Blunder"
+    | "A Miss"
     | "Forced"
-    | "Book"
-    | "Missed Win"
+    | "A Book Move"
+    | "A Missed Win"
     | "Unknown";
 
 type Props = {
@@ -46,6 +48,36 @@ export default function GameReview({
     const [dots, setDots] = useState(0);
     const [moveQualities, setMoveQualities] = useState<MoveQuality[]>([]);
     const [openingName, setOpeningName] = useState<string>("Unknown");
+
+    const moveToColor: Record<string, string> = {
+        "a book move": "text-[#C5A888]",
+        "a blunder": "text-[#FF2220]",
+        "the best move": "text-[#89C465]",
+        "excellent": "text-[#89C465]",
+        "an inaccuracy": "text-[#F4BB44]",
+        "good": "text-[#8ea47c]",
+        "a mistake": "text-[#ffa358]",
+        "a miss": "text-[#ee6b55]",
+        "a missed win": "text-[#F4BB44]",
+        "forced": "text-[#8ea47c]",
+        "critical": "text-[#85a7ca]",
+        "brilliant": "text-[#2ec3ed]",
+    };
+
+    const moveToIcon: Record<string, React.ComponentType> = {
+        "a book move": BookIcon,
+        "a blunder": BlunderIcon,
+        "the best move": BestMoveIcon,
+        "excellent": ExcellentMoveIcon,
+        "an inaccuracy": InaccuracyMoveIcon,
+        "good": GoodMoveIcon,
+        "a mistake": MistakeMoveIcon,
+        "a miss": MissMoveIcon,
+        "a missed win": MissedWinMoveIcon,
+        "forced": ForcedMoveIcon,
+        "critical": CriticalMoveIcon,
+        "brilliant": BrilliantMoveIcon,
+    };
 
     const [lastMove, setLastMove] = useState<{
         from: string;
@@ -175,12 +207,12 @@ export default function GameReview({
 
             // Found a mate
             if (mateBefore === null && mateAfter !== null) {
-                return winningForPlayer(mateAfter) ? "Best" : "Blunder";
+                return winningForPlayer(mateAfter) ? "The Best Move" : "A Blunder";
             }
 
             // Lost a mate
             if (mateBefore !== null && mateAfter === null) {
-                return winningForPlayer(mateBefore) ? "Missed Win" : "Blunder";
+                return winningForPlayer(mateBefore) ? "A Missed Win" : "A Blunder";
             }
 
             if (mateBefore !== null && mateAfter !== null) {
@@ -189,17 +221,17 @@ export default function GameReview({
 
                 // Mate switched sides
                 if (beforeWinning !== afterWinning) {
-                    return afterWinning ? "Best" : "Blunder";
+                    return afterWinning ? "The Best Move" : "A Blunder";
                 }
 
                 const beforeDist = Math.abs(mateBefore);
                 const afterDist = Math.abs(mateAfter);
 
                 if (afterWinning) {
-                    if (afterDist <= beforeDist - 1) return "Best";
+                    if (afterDist <= beforeDist - 1) return "The Best Move";
                     if (afterDist > beforeDist) return "Excellent";
                 } else {
-                    if (afterDist >= beforeDist - 1) return "Best";
+                    if (afterDist >= beforeDist - 1) return "The Best Move";
                     if (afterDist < beforeDist - 1) return "Excellent";
                 }
             }
@@ -213,12 +245,12 @@ export default function GameReview({
                 ? beforeChance - afterChance
                 : afterChance - beforeChance;
 
-        if (playedMove === bestMove) return "Best";
+        if (playedMove === bestMove) return "The Best Move";
         if (loss <= 0.035) return "Excellent";
         if (loss <= 0.07) return "Good";
-        if (loss <= 0.1) return "Inaccuracy";
-        if (loss <= 0.2) return "Mistake";
-        if (loss <= 1) return "Blunder";
+        if (loss <= 0.1) return "An Inaccuracy";
+        if (loss <= 0.2) return "A Mistake";
+        if (loss <= 1) return "A Blunder";
 
         return "Unknown";
     }
@@ -322,15 +354,13 @@ export default function GameReview({
                     tempGame.move(moves[j]);
                 }
 
-                const fenBefore = tempGame.fen();
-
                 if (tempGame.moves().length === 1) {
                     qualities.push("Forced");
                     continue;
                 }
 
                 if (i <= 20 && isBookMove(moves.slice(0, i))) {
-                    qualities.push("Book");
+                    qualities.push("A Book Move");
                     continue;
                 }
 
@@ -345,7 +375,7 @@ export default function GameReview({
                     );
 
                     if (missed) {
-                        qualities.push("Miss");
+                        qualities.push("A Miss");
                         continue;
                     }
                 }
@@ -377,7 +407,7 @@ export default function GameReview({
 
             setMoveQualities(qualities);
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 500));
             setAnalysing(false);
         }
 
@@ -460,7 +490,7 @@ export default function GameReview({
             />
 
             {/* Board */}
-            <div className="flex h-[500px] w-[540px] items-center gap-2">
+            <div className="flex h-[500px] w-[540px] items-center gap-2 justify-self-center">
                 <EvaluationBar
                     evaluation={currentEvaluation.score}
                     mate={currentEvaluation.mate}
@@ -476,34 +506,73 @@ export default function GameReview({
             </div>
 
             {/* Evaluation */}
-            <div className="flex flex-col items-center">
-                <h2 className="text-xl">
+            <div className="m-5 w-[400px] rounded-xl items-center justify-self-end bg-background-100 p-4 overflow-hidden flex flex-col h-[95%]">
+                <h2 className="mb-12 text-3xl text-text-950 font-bold self-center justify-self-center">
                     Move Analysis
                 </h2>
+                <div className="flex flex-col w-full items-center gap-3">
+                    {/* Tools */}
+                    <div className="flex gap-2 p-2 bg-secondary-400 rounded-lg w-full items-center justify-center">
+                        <RefreshCcw size={30} className="cursor-pointer"/>
+                        <Settings size={30} className="cursor-pointer"/>
+                        <Share2 size={30} className="cursor-pointer"/>
+                    </div>
+                    <div className="flex flex-col rounded-lg w-full overflow-hidden">
+                        {currentMove > 0 && moveQualities[currentMove - 1] !== undefined && moveQualities[currentMove - 1] !== null && (() => {
+                            const qualityKey = moveQualities[currentMove - 1]?.toLowerCase() ?? "";
 
-                <p>
-                    {moveQualities[currentMove - 1] ?? "No analysis"}
-                </p>
-                <p>
-                    {openingName}
-                </p>
-                <p>
-                    {currentMove > 0
-                        ? `The best move was: ${uciToSan(
-                            evaluations[currentMove - 1]?.bestMove,
-                            (() => {
+                            const IconComponent = moveToIcon[qualityKey] ?? BookIcon;
+
+                            return (
+                                <div className="flex gap-1 items-center justify-center bg-secondary-400 w-full p-2">
+                                    
+                                    <IconComponent />
+
+                                    <span className={`text-xl ${moveToColor[qualityKey] ?? 'text-[#C5A888]'} font-medium [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]`}>
+                                        {moves[currentMove - 1]} is {moveQualities[currentMove - 1]?.toLowerCase() ?? "No analysis"}
+                                    </span>
+                                </div>
+                            );
+                        })()}
+
+                        {(() => {
+                            const playedMove = moves[currentMove - 1];
+
+                            const bestMoveUci = evaluations[currentMove - 1]?.bestMove;
+                            let bestMoveSan = "";
+
+                            if (currentMove > 0 && bestMoveUci) {
                                 const tempGame = new Chess();
-
                                 for (let i = 0; i < currentMove - 1; i++) {
                                     tempGame.move(moves[i]);
                                 }
+                                bestMoveSan = uciToSan(bestMoveUci, tempGame.fen());
+                            }
 
-                                return tempGame.fen();
-                            })()
-                        )}`
-                        : "No move yet"
-                    }
-                </p>
+                            if (currentMove <= 0 || bestMoveSan === playedMove || moveQualities[currentMove - 1]?.toLowerCase() === "a book move") {
+                                return null;
+                            }
+
+                            return (
+                                <div className="bg-secondary-400 w-full text-center p-2">
+                                    <span className="font-medium text-center text-accent-600">
+                                        The best move was: {bestMoveSan}
+                                    </span>
+                                </div>
+                            );
+                        })()}
+
+                        {openingName !== "Starting Position" && (
+                            <div className="flex items-center justify-center bg-secondary-300 w-full p-2">
+                                <span className="text-xl font-medium text-center">
+                                    {openingName}
+                                </span>
+                            </div>
+                        )}
+
+
+                    </div>
+                </div>
             </div>
 
         </div>
