@@ -31,8 +31,6 @@ export async function analyseGame(moves: string[]) {
 
     const evaluations = await evaluatePositions(fens);
 
-    console.log(evaluations);
-
     return evaluations;
 }
 

@@ -76,11 +76,6 @@ export function getEvaluation(
     let score = 0;
     let mate: number | null = null;
     let bestDepth = -1;
-    let moves: {
-      move: string;
-      score: number;
-      mate: number | null;
-    }[] = [];
 
     const handler = (event: MessageEvent) => {
       const line = event.data;
@@ -98,27 +93,20 @@ export function getEvaluation(
         );
 
         sf.postMessage(
-          "go depth 12 multipv 3"
+          "go depth 12"
         );
 
         return;
       }
 
-      if (line.startsWith("info") && line.includes("multipv")) {
-
+      if (line.startsWith("info") && line.includes("score")) {
         const parts = line.split(" ");
 
         const depthIndex = parts.indexOf("depth");
-        const multiIndex = parts.indexOf("multipv");
-        const scoreIndex = parts.indexOf("score");
-        const pvIndex = parts.indexOf("pv");
 
-        if (
-          depthIndex === -1 ||
-          multiIndex === -1 ||
-          scoreIndex === -1 ||
-          pvIndex === -1
-        ) return;
+        const scoreIndex = parts.indexOf("score");
+
+        if (depthIndex === -1 || scoreIndex === -1) return;
 
         const depth = Number(parts[depthIndex + 1]);
 
@@ -126,21 +114,18 @@ export function getEvaluation(
 
         bestDepth = depth;
 
-        const move = parts[pvIndex + 1];
         const type = parts[scoreIndex + 1];
+
         const value = Number(parts[scoreIndex + 2]);
 
-        moves[Number(parts[multiIndex + 1]) - 1] = {
-          move,
-          score:
-            type === "cp"
-              ? value / 100
-              : 0,
-          mate:
-            type === "mate"
-              ? value
-              : null,
-        };
+        if (type === "cp") {
+          score = value / 100;
+          mate = null;
+        }
+
+        if (type === "mate") {
+          mate = value;
+        }
       }
 
       if (line.startsWith("bestmove")) {

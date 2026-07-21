@@ -6,7 +6,7 @@ import ReviewBoard from "@/components/ReviewBoard";
 import ReviewMoveHistory from "@/components/ReviewMoveHistory";
 import EvaluationBar from "@/components/EvaluationBar";
 import { analysePositions } from "@/lib/stockfish";
-import { getOpeningFromMoves } from "@/lib/getOpening";
+import { getOpeningFromMoves, isBookMove } from "@/lib/getOpening";
 
 type MoveQuality =
     | "Brilliant"
@@ -118,27 +118,11 @@ export default function GameReview({
         return move?.san ?? uci;
     }
 
-    function evaluationToWinChance(cp: number) {
+    function evaluationToWinChance(score: number) {
+        const cp = score * 100;
         return (
-            0.5 +
-            0.5 *
-            ((2 / (1 + Math.exp(-0.004 * cp))) - 1)
+            0.5 + 0.5 * ((2 / (1 + Math.exp(-0.004 * cp))) - 1)
         );
-    }
-
-    async function isBookMove(fen: string): Promise<boolean> {
-        try {
-            const response = await fetch(
-                `https://explorer.lichess.ovh/masters?fen=${encodeURIComponent(fen)}`
-            );
-
-            const data = await response.json();
-
-            return data.moves?.length > 0;
-
-        } catch {
-            return false;
-        }
     }
 
     function classifyMiss(
@@ -179,11 +163,10 @@ export default function GameReview({
         after: number,
         mateBefore: number | null,
         mateAfter: number | null,
+        bestMove: string,
+        playedMove: string,
         turn: "w" | "b"
     ): MoveQuality {
-
-        console.log(mateBefore, mateAfter)
-
         // Checkmate move
         if (mateBefore !== null || mateAfter !== null) {
             const winningForPlayer = (mate: number) =>
@@ -230,15 +213,7 @@ export default function GameReview({
                 ? beforeChance - afterChance
                 : afterChance - beforeChance;
 
-        console.log({
-            before,
-            after,
-            beforeChance,
-            afterChance,
-            loss,
-        });
-
-        if (loss <= 0.01) return "Best";
+        if (playedMove === bestMove) return "Best";
         if (loss <= 0.035) return "Excellent";
         if (loss <= 0.07) return "Good";
         if (loss <= 0.1) return "Inaccuracy";
@@ -354,7 +329,7 @@ export default function GameReview({
                     continue;
                 }
 
-                if (i <= 20 && await isBookMove(fenBefore)) {
+                if (i <= 20 && isBookMove(moves.slice(0, i))) {
                     qualities.push("Book");
                     continue;
                 }
@@ -375,39 +350,32 @@ export default function GameReview({
                     }
                 }
 
+                const playedMove = (() => {
+                    const temp = new Chess();
+
+                    for (let j = 0; j < i - 1; j++) {
+                        temp.move(moves[j]);
+                    }
+
+                    const move = temp.move(moves[i - 1]);
+
+                    return move.from + move.to + (move.promotion ?? "");
+                })();
+
                 qualities.push(
                     classifyMove(
                         correctedResult[i - 1].score,
                         correctedResult[i].score,
                         correctedResult[i - 1].mate,
                         correctedResult[i].mate,
-                        turn
+                        correctedResult[i - 1].bestMove,
+                        playedMove,
+                        turn,
                     )
                 );
             }
 
             setMoveQualities(qualities);
-
-            console.log(
-                "Stockfish result:",
-                correctedResult
-            );
-
-            console.log(
-                "moves:",
-                moves.length
-            );
-
-            console.log(
-                "fens analysed:",
-                fens.length
-            );
-
-            console.log(
-                "evaluations:",
-                correctedResult.length
-            );
-
 
             await new Promise((resolve) => setTimeout(resolve, 1000));
             setAnalysing(false);
@@ -430,7 +398,7 @@ export default function GameReview({
 
         setOpeningName(opening?.name ?? "Unknown");
 
-    }, [currentMove, moves]);
+    }, [currentMove, moves.join(",")]);
 
     useEffect(() => {
         rebuildCaptured(game);
